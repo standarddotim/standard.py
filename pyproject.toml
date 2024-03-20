@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "standard.py"
+version = "0.0.0"
+description = "A python API client library to interact with Standard exchange"
+authors = ["Hyungsuk Kang <hskang9@gmail.com>"]
+license = "apache-2.0"
+readme = "README.md"
+packages = [{include="standard"}, {include="tests"}]
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+web3 = "^6.15.1"
+asyncio = "^3.4.3"
+aiohttp = "^3.9.3"
+eth-account = "^0.11.0"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+black = "^24.3.0"
+flake8 = "^7.0.0"
+pre-commit = "^3.6.2"
+tox = "^4.14.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
