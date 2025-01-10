@@ -1,3 +1,18 @@
+<div align="center">
+
+<img src="./media/standard_profile.jpeg" width=100/>
+
+  <h1><code>Standard Python Client</code></h1>
+
+  <p>
+    <strong>A Python API client for Standard Exchange</strong>
+  </p>
+
+  <p>
+    <a href="https://t.me/standard_protocol"><img alt="Telegram Chat" src="https://img.shields.io/badge/telegram-chat-blue?logo=telegram"></a>
+  </p>
+</div>
+
 # Standard Exchange Python API Client
 
 This is a Python API client for connecting to the Standard Exchange. It provides a set of asynchronous methods to interact with the exchange's API, allowing you to fetch order books, trade histories, token information, and more.
