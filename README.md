@@ -149,6 +149,8 @@ asyncio.run(main())
 
 Contributions are welcome! Please open an issue or submit a pull request on GitHub.
 
+For the guide, check [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## License
 
 This project is licensed under the MIT License.
