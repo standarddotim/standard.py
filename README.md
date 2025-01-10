@@ -99,6 +99,14 @@ recent_pair_trades = await client.fetch_recent_pair_trades_paginated(
 )
 ```
 
+## Use Cases
+
+The Standard Exchange Python API Client can be used for various purposes, including but not limited to:
+
+- **Trade Automation**: Automate your trading strategies by interacting with the exchange's API to place and manage orders programmatically.
+- **AI Trading Agent**: Develop AI-driven trading agents that can analyze market data, make trading decisions, and execute trades autonomously.
+- **Market Research**: Gather and analyze market data such as order books, trade histories, and token information to conduct in-depth market research and analysis.
+
 ## Examples
 
 You can find example code in the `examples` folder. Here are some examples:
