@@ -1,6 +1,6 @@
 # Contributing to Standard Exchange Python API Client
 
-![contributors](memes/image.png)
+![contributooooor](memes/image.png)
 
 Thank you for considering contributing to the Standard Exchange Python API Client! We welcome contributions from the community to help improve and enhance the project.
 
