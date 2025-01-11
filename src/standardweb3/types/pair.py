@@ -17,8 +17,8 @@ class Pair:
     ath: float
     atl: float
     listingDate: float
-    dayDifference: float
-    dayDifferencePercentage: float
+    dayPriceDifference: float
+    dayPriceDifferencePercentage: float
     dayBaseVolume: float
     dayQuoteVolume: float
     dayBaseVolumeUSD: float
@@ -35,15 +35,6 @@ class Pair:
     totalDayBuckets: int
     totalWeekBuckets: int
     totalMonthBuckets: int
-    count: int
-    baseVolume: float
-    quoteVolume: float
-    baseVolumeUSD: float
-    quoteVolumeUSD: float
-    baseTvl: float
-    quoteTvl: float
-    baseTvlUSD: float
-    quoteTvlUSD: float
 
 
 @dataclass

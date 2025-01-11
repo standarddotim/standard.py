@@ -5,13 +5,13 @@ from standardweb3.api import APIFunctions
 from web3 import Web3
 from eth_account import Account
 import socketio
-from types.orderbook import Orderbook
-from types.orderhistory import AccountOrderHistory
-from types.order import AccountOrders
-from types.pair import Pair, PairData
-from types.token import TokenData, TokenInfo
-from types.tradehistory import AccountTradeHistory
-from types.trade import TradesData
+from standardweb3.types.orderbook import Orderbook
+from standardweb3.types.orderhistory import AccountOrderHistory
+from standardweb3.types.order import AccountOrders
+from standardweb3.types.pair import Pair, PairData
+from standardweb3.types.token import TokenData, TokenInfo
+from standardweb3.types.tradehistory import AccountTradeHistory
+from standardweb3.types.trade import TradesData
 from typing import Callable, Dict
 
 

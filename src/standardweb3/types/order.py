@@ -32,7 +32,7 @@ class Order:
     orderId: int
     base: Token
     quote: Token
-    pair: str
+    symbol: str
     orderbook: str
     price: float
     amount: float

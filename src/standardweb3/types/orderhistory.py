@@ -10,13 +10,11 @@ class OrderHistory:
     isBid: int
     base: Token
     quote: Token
-    pair: str
+    symbol: str
     orderbook: str
     price: float
     amount: float
     timestamp: float
-    maker: str
-    taker: str
     account: str
     txHash: str
 

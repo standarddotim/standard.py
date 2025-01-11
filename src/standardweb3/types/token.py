@@ -18,8 +18,8 @@ class Token:
     ath: float
     atl: float
     listingDate: float
-    dayDifference: float
-    dayDifferencePercentage: float
+    dayPriceDifference: float
+    dayPriceDifferencePercentage: float
     dayTvl: float
     dayTvlUSD: float
     dayVolume: float
@@ -68,8 +68,8 @@ class TokenInfo:
     ath: float
     atl: float
     listingDate: float
-    dayDifference: float
-    dayDifferencePercentage: float
+    dayPriceDifference: float
+    dayPriceDifferencePercentage: float
     dayTvl: float
     dayTvlUSD: float
     dayVolume: float

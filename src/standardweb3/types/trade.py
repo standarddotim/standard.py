@@ -9,7 +9,7 @@ class UpdateTradeEvent:
     orderId: int
     base: str
     quote: str
-    pair: str
+    symbol: str
     isBid: int
     price: float
     orderbook: str
@@ -28,7 +28,7 @@ class Trade:
     orderId: int
     base: Token
     quote: Token
-    pair: str
+    symbol: str
     isBid: int
     price: float
     baseAmount: float
