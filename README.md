@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./memes/standard_profile.jpeg" width=100/>
+<img src="./media/standard_profile.jpeg" width=100/>
 
   <h1><code>Standard Python Client</code></h1>
 
