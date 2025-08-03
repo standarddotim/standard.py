@@ -16,7 +16,7 @@ async def client():
     return StandardClient(
         private_key=os.getenv("PRIVATE_KEY", ""),
         http_rpc_url="https://your_rpc_url",
-        networkName="Story Odyssey Testnet",
+        networkName="connected network name",
         api_key=os.getenv("ADMIN_API_KEY", ""),
     )
 

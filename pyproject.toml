@@ -10,11 +10,14 @@ requires-python = ">=3.13"
 dependencies = [
     "aiohttp>=3.11.11",
     "asyncio>=3.4.3",
+    "eth-abi>=5.1.0",
     "eth-account>=0.13.4",
+    "eth-typing>=5.1.0",
+    "eth-utils>=5.1.0",
     "pre-commit>=4.0.1",
     "python-dotenv>=1.0.1",
-    "python-socketio>=5.12.1",
     "web3>=7.6.1",
+    "websockets>=13.1",
 ]
 
 [build-system]

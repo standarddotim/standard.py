@@ -1,4 +1,11 @@
-from .contracts import matching_engine_addresses
-from .urls import ponder_urls, websocket_urls
+"""
+Constants module for StandardWeb3.
 
-__all__ = ["matching_engine_addresses", "ponder_urls", "websocket_urls"]
+Provides network-specific constants including contract addresses,
+API URLs, and WebSocket endpoints.
+"""
+
+from .contracts import matching_engine_addresses
+from .urls import api_urls, websocket_urls
+
+__all__ = ["matching_engine_addresses", "api_urls", "websocket_urls"]

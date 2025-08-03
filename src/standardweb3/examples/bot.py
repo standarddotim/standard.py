@@ -1,11 +1,11 @@
-"""Example bot implementation for Standard Exchange WebSocket API."""
+"""Example bot implementation for Standard Exchange API."""
 
 import asyncio
 from bot import Bot
 from types.orderbook import TickEvent
 
 # Initialize the bot with the server URL
-bot = Bot("http://your-server-url")
+bot = Bot("wss://api.standard.xyz/ws")
 
 
 # Developers can configure their own logic for the 'tick' event
