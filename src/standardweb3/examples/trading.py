@@ -17,17 +17,14 @@ import asyncio
 import os
 from typing import Optional
 
-from web3 import Web3
-from eth_account import Account
+from dotenv import load_dotenv
 
-# Import the contract functions and constants
-from standardweb3.contract import ContractFunctions
-from standardweb3.abis.matching_engine import matching_engine_abi
-from standardweb3.consts.contracts import matching_engine_addresses
+# Import the StandardClient
+from standardweb3 import StandardClient
 
 
 class TradingExample:
-    """Comprehensive trading example using StandardWeb3 contract functions."""
+    """Comprehensive trading example using StandardWeb3 client."""
 
     def __init__(
         self,
@@ -43,38 +40,25 @@ class TradingExample:
             private_key: Private key for signing transactions
             network: Network name (default: Story Odyssey Testnet)
         """
-        self.w3 = Web3(Web3.HTTPProvider(rpc_url))
-        self.private_key = private_key
-        self.account = Account.from_key(private_key)
-        self.address = self.account.address
-
-        # Get matching engine address for the specified network
-        self.matching_engine_address = matching_engine_addresses.get(network)
-        if not self.matching_engine_address:
-            raise ValueError(
-                f"Network '{network}' not found in matching_engine_addresses"
-            )
-
-        # Initialize contract functions
-        self.contract_functions = ContractFunctions(
-            w3=self.w3,
+        # Initialize StandardClient
+        self.client = StandardClient(
             private_key=private_key,
-            address=self.address,
-            matching_engine=self.matching_engine_address,
-            matching_engine_abi=matching_engine_abi,
+            http_rpc_url=rpc_url,
+            networkName=network,
+            api_url=None,
+            websocket_url=None,
         )
 
         print(f"Initialized trading example for {network}")
-        print(f"Account: {self.address}")
-        print(f"Matching Engine: {self.matching_engine_address}")
-        print(f"Network ID: {self.w3.eth.chain_id}")
+        print(f"Account: {self.client.contract.address}")
+        print(f"Network ID: {self.client.contract.w3.eth.chain_id}")
         print("-" * 50)
 
     async def check_balance(self, token_address: str) -> int:
         """Check token balance for the connected account."""
         # Simple ERC20 balance check (you might want to use a proper ERC20 ABI)
-        balance = self.w3.eth.get_balance(self.address)
-        print(f"ETH Balance: {self.w3.from_wei(balance, 'ether')} ETH")
+        balance = self.client.w3.eth.get_balance(self.client.address)
+        print(f"ETH Balance: {self.client.w3.from_wei(balance, 'ether')} ETH")
         return balance
 
     async def market_buy_example(
@@ -84,8 +68,8 @@ class TradingExample:
         quote_amount: int,
         is_maker: bool = False,
         n: int = 1,
-        uid: int = 0,
         recipient: Optional[str] = None,
+        slippageLimit: int = 10000000,
     ):
         """
         Execute a market buy order.
@@ -100,24 +84,25 @@ class TradingExample:
             recipient: Recipient address (defaults to sender)
         """
         if recipient is None:
-            recipient = self.address
+            recipient = self.client.address
 
         print("Executing Market Buy:")
         print(f"  Base Token: {base_token}")
         print(f"  Quote Token: {quote_token}")
-        print(f"  Quote Amount: {self.w3.from_wei(quote_amount, 'ether')} ETH")
+        print(f"  Quote Amount: {self.client.w3.from_wei(quote_amount, 'ether')} ETH")
         print(f"  Is Maker: {is_maker}")
         print(f"  Recipient: {recipient}")
+        print(f"  Slippage Limit: {slippageLimit}")
 
         try:
-            tx_receipt = await self.contract_functions.market_buy(
+            tx_receipt = await self.client.market_buy(
                 base=base_token,
                 quote=quote_token,
                 quote_amount=quote_amount,
                 is_maker=is_maker,
                 n=n,
-                uid=uid,
                 recipient=recipient,
+                slippageLimit=slippageLimit,
             )
 
             print("✅ Market Buy successful!")
@@ -138,8 +123,8 @@ class TradingExample:
         base_amount: int,
         is_maker: bool = False,
         n: int = 1,
-        uid: int = 0,
         recipient: Optional[str] = None,
+        slippageLimit: int = 10000000,
     ):
         """
         Execute a market sell order.
@@ -154,24 +139,25 @@ class TradingExample:
             recipient: Recipient address (defaults to sender)
         """
         if recipient is None:
-            recipient = self.address
+            recipient = self.client.address
 
         print("Executing Market Sell:")
         print(f"  Base Token: {base_token}")
         print(f"  Quote Token: {quote_token}")
-        print(f"  Base Amount: {self.w3.from_wei(base_amount, 'ether')} tokens")
+        print(f"  Base Amount: {self.client.w3.from_wei(base_amount, 'ether')} tokens")
         print(f"  Is Maker: {is_maker}")
         print(f"  Recipient: {recipient}")
+        print(f"  Slippage Limit: {slippageLimit}")
 
         try:
-            tx_receipt = await self.contract_functions.market_sell(
+            tx_receipt = await self.client.market_sell(
                 base=base_token,
                 quote=quote_token,
                 base_amount=base_amount,
                 is_maker=is_maker,
                 n=n,
-                uid=uid,
                 recipient=recipient,
+                slippageLimit=slippageLimit,
             )
 
             print("✅ Market Sell successful!")
@@ -210,25 +196,24 @@ class TradingExample:
             recipient: Recipient address (defaults to sender)
         """
         if recipient is None:
-            recipient = self.address
+            recipient = self.client.address
 
         print("Executing Limit Buy:")
         print(f"  Base Token: {base_token}")
         print(f"  Quote Token: {quote_token}")
-        print(f"  Price: {self.w3.from_wei(price, 'ether')} ETH per token")
-        print(f"  Quote Amount: {self.w3.from_wei(quote_amount, 'ether')} ETH")
+        print(f"  Price: {self.client.w3.from_wei(price, 'ether')} ETH per token")
+        print(f"  Quote Amount: {self.client.w3.from_wei(quote_amount, 'ether')} ETH")
         print(f"  Is Maker: {is_maker}")
         print(f"  Recipient: {recipient}")
 
         try:
-            tx_receipt = await self.contract_functions.limit_buy(
+            tx_receipt = await self.client.limit_buy(
                 base=base_token,
                 quote=quote_token,
                 price=price,
                 quote_amount=quote_amount,
                 is_maker=is_maker,
                 n=n,
-                uid=uid,
                 recipient=recipient,
             )
 
@@ -268,25 +253,24 @@ class TradingExample:
             recipient: Recipient address (defaults to sender)
         """
         if recipient is None:
-            recipient = self.address
+            recipient = self.client.address
 
         print("Executing Limit Sell:")
         print(f"  Base Token: {base_token}")
         print(f"  Quote Token: {quote_token}")
-        print(f"  Price: {self.w3.from_wei(price, 'ether')} ETH per token")
-        print(f"  Base Amount: {self.w3.from_wei(base_amount, 'ether')} tokens")
+        print(f"  Price: {self.client.w3.from_wei(price, 'ether')} ETH per token")
+        print(f"  Base Amount: {self.client.w3.from_wei(base_amount, 'ether')} tokens")
         print(f"  Is Maker: {is_maker}")
         print(f"  Recipient: {recipient}")
 
         try:
-            tx_receipt = await self.contract_functions.limit_sell(
+            tx_receipt = await self.client.limit_sell(
                 base=base_token,
                 quote=quote_token,
                 price=price,
                 base_amount=base_amount,
                 is_maker=is_maker,
                 n=n,
-                uid=uid,
                 recipient=recipient,
             )
 
@@ -307,7 +291,7 @@ class TradingExample:
         print("=" * 50)
 
         # Check initial balance
-        await self.check_balance(self.address)
+        await self.check_balance(self.client.address)
         print()
 
         # Example token addresses
@@ -326,12 +310,13 @@ class TradingExample:
         print("-" * 30)
         try:
             # Small amount for testing (0.001 ETH)
-            quote_amount = self.w3.to_wei(0.001, "ether")
+            quote_amount = self.client.w3.to_wei(0.001, "ether")
             await self.market_buy_example(
                 base_token=example_base_token,
                 quote_token=example_quote_token,
                 quote_amount=quote_amount,
                 is_maker=False,
+                slippageLimit=10000000,
             )
         except Exception as e:
             print(f"Market buy example failed: {e}")
@@ -342,12 +327,13 @@ class TradingExample:
         print("-" * 30)
         try:
             # Small amount for testing (0.001 tokens)
-            base_amount = self.w3.to_wei(0.001, "ether")
+            base_amount = self.client.w3.to_wei(0.001, "ether")
             await self.market_sell_example(
                 base_token=example_base_token,
                 quote_token=example_quote_token,
                 base_amount=base_amount,
                 is_maker=False,
+                slippageLimit=10000000,
             )
         except Exception as e:
             print(f"Market sell example failed: {e}")
@@ -357,8 +343,8 @@ class TradingExample:
         print("💰 Example 3: Limit Buy")
         print("-" * 30)
         try:
-            price = self.w3.to_wei(0.1, "ether")  # 0.1 ETH per token
-            quote_amount = self.w3.to_wei(0.01, "ether")  # 0.01 ETH
+            price = self.client.w3.to_wei(0.1, "ether")  # 0.1 ETH per token
+            quote_amount = self.client.w3.to_wei(0.01, "ether")  # 0.01 ETH
             await self.limit_buy_example(
                 base_token=example_base_token,
                 quote_token=example_quote_token,
@@ -374,8 +360,8 @@ class TradingExample:
         print("💸 Example 4: Limit Sell")
         print("-" * 30)
         try:
-            price = self.w3.to_wei(0.15, "ether")  # 0.15 ETH per token
-            base_amount = self.w3.to_wei(0.01, "ether")  # 0.01 tokens
+            price = self.client.w3.to_wei(0.15, "ether")  # 0.15 ETH per token
+            base_amount = self.client.w3.to_wei(0.01, "ether")  # 0.01 tokens
             await self.limit_sell_example(
                 base_token=example_base_token,
                 quote_token=example_quote_token,
@@ -392,16 +378,22 @@ class TradingExample:
 
 async def main():
     """Run the trading examples."""
+    # Load environment variables from .env file
+    load_dotenv()
+
     # Configuration - Replace with your actual values
-    RPC_URL = os.getenv(
-        "RPC_URL", "https://rpc.testnet.mode.network"
-    )  # Example RPC URL
+    RPC_URL = os.getenv("RPC_URL", "https://rpc.testnet.mode.network")
     PRIVATE_KEY = os.getenv("PRIVATE_KEY", "")  # Your private key
-    NETWORK = "Story Odyssey Testnet"  # or "Mode Mainnet"
+    NETWORK = os.getenv("NETWORK", "Story Odyssey Testnet")
 
     if not PRIVATE_KEY:
         print("❌ Please set your PRIVATE_KEY environment variable")
         print("Example: export PRIVATE_KEY='your_private_key_here'")
+        return
+
+    if not RPC_URL:
+        print("❌ Please set your RPC_URL environment variable")
+        print("Example: export RPC_URL='your_rpc_url_here'")
         return
 
     try:

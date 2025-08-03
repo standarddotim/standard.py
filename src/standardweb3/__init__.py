@@ -82,6 +82,11 @@ class StandardClient:
             matching_engine_abi,
         )
 
+        # Expose commonly used attributes from contract
+        self.w3 = self.contract.w3
+        self.address = self.contract.address
+        self.account = self.contract.account
+
         # Initialize api functions
         self.api = APIFunctions(self.api_url, api_key)
 
@@ -92,35 +97,35 @@ class StandardClient:
 
     # Contract functions
     async def market_buy(
-        self, base, quote, quote_amount, is_maker, n, uid, recipient
+        self, base, quote, quote_amount, is_maker, n, recipient, slippageLimit
     ) -> str:
         """Execute a market buy order."""
         return await self.contract.market_buy(
-            base, quote, quote_amount, is_maker, n, uid, recipient
+            base, quote, quote_amount, is_maker, n, recipient, slippageLimit
         )
 
     async def market_sell(
-        self, base, quote, base_amount, is_maker, n, uid, recipient
+        self, base, quote, base_amount, is_maker, n, recipient, slippageLimit
     ) -> str:
         """Execute a market sell order."""
         return await self.contract.market_sell(
-            base, quote, base_amount, is_maker, n, uid, recipient
+            base, quote, base_amount, is_maker, n, recipient, slippageLimit
         )
 
     async def limit_buy(
-        self, base, quote, price, quote_amount, is_maker, n, uid, recipient
+        self, base, quote, price, quote_amount, is_maker, n, recipient
     ) -> str:
         """Execute a limit buy order."""
         return await self.contract.limit_buy(
-            base, quote, price, quote_amount, is_maker, n, uid, recipient
+            base, quote, price, quote_amount, is_maker, n, recipient
         )
 
     async def limit_sell(
-        self, base, quote, price, base_amount, is_maker, n, uid, recipient
+        self, base, quote, price, base_amount, is_maker, n, recipient
     ) -> str:
         """Execute a limit sell order."""
         return await self.contract.limit_sell(
-            base, quote, price, base_amount, is_maker, n, uid, recipient
+            base, quote, price, base_amount, is_maker, n, recipient
         )
 
     #########################################################

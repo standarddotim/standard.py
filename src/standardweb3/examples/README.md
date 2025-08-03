@@ -20,13 +20,34 @@ pip install web3 eth-account
 
 ### 2. Set Environment Variables
 
-Set your private key as an environment variable:
+#### Option A: Using .env file (Recommended)
+
+1. Copy the example environment file:
+```bash
+cp env.example .env
+```
+
+2. Edit `.env` and add your actual values:
+```bash
+# Your Ethereum private key (without 0x prefix)
+PRIVATE_KEY=your_actual_private_key_here
+
+# RPC URL for your network
+RPC_URL=https://rpc.testnet.mode.network
+
+# Network name
+NETWORK=Story Odyssey Testnet
+```
+
+#### Option B: Using environment variables
 
 ```bash
 export PRIVATE_KEY="your_private_key_here"
+export RPC_URL="https://rpc.testnet.mode.network"
+export NETWORK="Story Odyssey Testnet"
 ```
 
-**⚠️ Security Warning**: Never commit your private key to version control. Always use environment variables or secure configuration files.
+**⚠️ Security Warning**: Never commit your private key to version control. The `.env` file is gitignored for your security.
 
 ### 3. Configure Network Settings
 
@@ -42,12 +63,20 @@ You can modify these in the example files or set them as environment variables.
 ### Running the Simple Example
 
 ```bash
-python simple_trading.py
+# Using uv (recommended)
+uv run src/standardweb3/examples/simple_trading.py
+
+# Or using python directly
+python src/standardweb3/examples/simple_trading.py
 ```
 
 ### Running the Comprehensive Example
 
 ```bash
+# Using uv (recommended)
+uv run src/standardweb3/examples/trading.py
+
+# Or using python directly
 python trading.py
 ```
 

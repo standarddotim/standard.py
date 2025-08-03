@@ -50,6 +50,8 @@ class ContractFunctions:
 
     def get_contract(self, contract_address, contract_abi):
         """Get contract instance."""
+        # checksum out of address
+        contract_address = Web3.to_checksum_address(contract_address)
         return self.w3.eth.contract(address=contract_address, abi=contract_abi)
 
     def sign_tx(self, tx):
@@ -61,9 +63,9 @@ class ContractFunctions:
 
     def send_tx(self, signed_tx):
         """Send a signed transaction."""
-        if not isinstance(signed_tx, dict):
-            raise Exception("Invalid signed transaction")
-        tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        if not hasattr(signed_tx, "raw_transaction"):
+            raise Exception("Invalid signed transaction - missing raw_transaction")
+        tx_hash = self.w3.eth.send_raw_transaction(signed_tx.raw_transaction)
         return tx_hash
 
     def wait_for_tx_receipt(self, tx_hash):
@@ -73,44 +75,96 @@ class ContractFunctions:
 
     async def _execute_transaction(self, function_name: str, *args) -> str:
         """Execute a contract transaction."""
-        contract = self.contract_functions.get_contract(
-            self.matching_engine, self.matching_engine_abi
-        )
-        tx = getattr(contract.functions, function_name)(*args).buildTransaction(
-            {
-                "from": self.address,
-                "nonce": self.w3.eth.getTransactionCount(self.address),
-                "gas": 2000000,
-                "gasPrice": self.w3.toWei(50000000000, "wei"),
-            }
-        )
-        signed_tx = self.contract_functions.sign_tx(tx)
-        tx_hash = await asyncio.to_thread(self.contract_functions.send_tx, signed_tx)
-        tx_receipt = await asyncio.to_thread(
-            self.contract_functions.wait_for_tx_receipt, tx_hash
-        )
+        contract = self.get_contract(self.matching_engine, self.matching_engine_abi)
+
+        # Get the contract function and build transaction
+        try:
+            contract_function = getattr(contract.functions, function_name)
+            function_call = contract_function(*args)
+
+            # Build the transaction using the correct method name
+            if hasattr(function_call, "build_transaction"):
+                tx = function_call.build_transaction(
+                    {
+                        "from": self.address,
+                        "nonce": self.w3.eth.get_transaction_count(self.address),
+                        "gas": 2000000,
+                        "gasPrice": self.w3.to_wei(50, "gwei"),
+                    }
+                )
+            else:
+                raise AttributeError(
+                    "Function call object does not have build_transaction method"
+                )
+
+        except Exception as e:
+            print(f"Error in contract function call: {e}")
+            raise
+
+        signed_tx = self.sign_tx(tx)
+
+        tx_hash = await asyncio.to_thread(self.send_tx, signed_tx)
+        tx_receipt = await asyncio.to_thread(self.wait_for_tx_receipt, tx_hash)
         return tx_receipt
 
     async def market_buy(
-        self, base, quote, quote_amount, is_maker, n, uid, recipient
+        self, base, quote, quote_amount, is_maker, n, recipient, slippageLimit
     ) -> str:
         """Execute a market buy order."""
+        # Ensure proper types for contract call
+        base = Web3.to_checksum_address(base)
+        quote = Web3.to_checksum_address(quote)
+        recipient = Web3.to_checksum_address(recipient)
+        quote_amount = int(quote_amount)
+        n = int(n)
+        slippageLimit = int(slippageLimit)
+
         return await self._execute_transaction(
-            "marketBuy", base, quote, quote_amount, is_maker, n, uid, recipient
+            "marketBuy",
+            base,
+            quote,
+            quote_amount,
+            is_maker,
+            n,
+            recipient,
+            slippageLimit,
         )
 
     async def market_sell(
-        self, base, quote, base_amount, is_maker, n, uid, recipient
+        self, base, quote, base_amount, is_maker, n, recipient, slippageLimit
     ) -> str:
         """Execute a market sell order."""
+        # Ensure proper types for contract call
+        base = Web3.to_checksum_address(base)
+        quote = Web3.to_checksum_address(quote)
+        recipient = Web3.to_checksum_address(recipient)
+        base_amount = int(base_amount)
+        n = int(n)
+        slippageLimit = int(slippageLimit)
+
         return await self._execute_transaction(
-            "marketSell", base, quote, base_amount, is_maker, n, uid, recipient
+            "marketSell",
+            base,
+            quote,
+            base_amount,
+            is_maker,
+            n,
+            recipient,
+            slippageLimit,
         )
 
     async def limit_buy(
-        self, base, quote, price, quote_amount, is_maker, n, uid, recipient
+        self, base, quote, price, quote_amount, is_maker, n, recipient
     ) -> str:
         """Execute a limit buy order."""
+        # Ensure proper types for contract call
+        base = Web3.to_checksum_address(base)
+        quote = Web3.to_checksum_address(quote)
+        recipient = Web3.to_checksum_address(recipient)
+        price = int(price)
+        quote_amount = int(quote_amount)
+        n = int(n)
+
         return await self._execute_transaction(
             "limitBuy",
             base,
@@ -119,14 +173,21 @@ class ContractFunctions:
             quote_amount,
             is_maker,
             n,
-            uid,
             recipient,
         )
 
     async def limit_sell(
-        self, base, quote, price, base_amount, is_maker, n, uid, recipient
+        self, base, quote, price, base_amount, is_maker, n, recipient
     ) -> str:
         """Execute a limit sell order."""
+        # Ensure proper types for contract call
+        base = Web3.to_checksum_address(base)
+        quote = Web3.to_checksum_address(quote)
+        recipient = Web3.to_checksum_address(recipient)
+        price = int(price)
+        base_amount = int(base_amount)
+        n = int(n)
+
         return await self._execute_transaction(
             "limitSell",
             base,
@@ -135,6 +196,5 @@ class ContractFunctions:
             base_amount,
             is_maker,
             n,
-            uid,
             recipient,
         )
