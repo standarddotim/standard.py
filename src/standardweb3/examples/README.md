@@ -33,7 +33,7 @@ cp env.example .env
 PRIVATE_KEY=your_actual_private_key_here
 
 # RPC URL for your network
-RPC_URL=https://rpc.testnet.mode.network
+RPC_URL=http_rpc_link
 
 # Network name
 NETWORK=Somnia Testnet
@@ -43,7 +43,7 @@ NETWORK=Somnia Testnet
 
 ```bash
 export PRIVATE_KEY="your_private_key_here"
-export RPC_URL="https://rpc.testnet.mode.network"
+export RPC_URL="http_rpc_link"
 export NETWORK="Somnia Testnet"
 ```
 

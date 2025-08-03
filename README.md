@@ -25,6 +25,70 @@ To install the client, you can use pip:
 pip install standardweb3
 ```
 
+## Quick Start
+
+### Environment Setup
+
+1. Create a `.env` file in your project root:
+
+```bash
+# Copy the example environment file
+cp env.example .env
+```
+
+2. Edit `.env` with your actual values:
+
+```bash
+# Your Ethereum private key (without 0x prefix)
+PRIVATE_KEY=your_actual_private_key_here
+
+# RPC URL for your network
+RPC_URL=https://rpc.testnet.mode.network
+
+# Network name (must match supported networks)
+NETWORK=Somnia Testnet
+```
+
+3. Install python-dotenv for environment variable loading:
+
+```bash
+pip install python-dotenv
+```
+
+### Basic Trading Example
+
+```python
+import asyncio
+import os
+from dotenv import load_dotenv
+from standardweb3 import StandardClient
+
+async def quick_trade():
+    load_dotenv()
+
+    client = StandardClient(
+        private_key=os.getenv("PRIVATE_KEY"),
+        http_rpc_url=os.getenv("RPC_URL"),
+        networkName=os.getenv("NETWORK"),
+        api_url=None,
+        websocket_url=None
+    )
+
+    # Market buy example
+    tx_receipt = await client.market_buy(
+        base="0xTokenAddress1",
+        quote="0xTokenAddress2",
+        quote_amount=client.w3.to_wei(0.01, "ether"),
+        is_maker=False,
+        n=1,
+        recipient=client.address,
+        slippageLimit=1000000
+    )
+    print(f"Trade successful: {tx_receipt['transactionHash'].hex()}")
+
+asyncio.run(quick_trade())
+```
+
 ## Usage
 
 First, import the necessary modules and initialize the `StandardClient`:
@@ -99,6 +163,78 @@ recent_pair_trades = await client.fetch_recent_pair_trades_paginated(
 )
 ```
 
+### Trading Operations
+
+The client supports both market and limit orders for buying and selling tokens:
+
+#### Market Orders
+
+Market orders execute immediately at the current market price:
+
+```python
+# Market Buy - Buy tokens immediately at market price
+tx_receipt = await client.market_buy(
+    base="0x1234...",  # Base token address
+    quote="0x5678...", # Quote token address
+    quote_amount=1000000000000000000,  # Amount in wei (1 ETH)
+    is_maker=False,
+    n=1,
+    recipient=client.address,
+    slippageLimit=1000000  # 10% slippage tolerance
+)
+
+# Market Sell - Sell tokens immediately at market price
+tx_receipt = await client.market_sell(
+    base="0x1234...",  # Base token address
+    quote="0x5678...", # Quote token address
+    base_amount=1000000000000000000,  # Amount in wei (1 token)
+    is_maker=False,
+    n=1,
+    recipient=client.address,
+    slippageLimit=1000000  # 10% slippage tolerance
+)
+```
+
+#### Limit Orders
+
+Limit orders are placed at a specific price and execute when the market reaches that price:
+
+```python
+# Limit Buy - Buy tokens at or below specified price
+tx_receipt = await client.limit_buy(
+    base="0x1234...",  # Base token address
+    quote="0x5678...", # Quote token address
+    price=2000000000000000000,  # Price in wei (2 ETH per token)
+    quote_amount=1000000000000000000,  # Amount in wei (1 ETH worth)
+    is_maker=True,
+    n=1,
+    recipient=client.address
+)
+
+# Limit Sell - Sell tokens at or above specified price
+tx_receipt = await client.limit_sell(
+    base="0x1234...",  # Base token address
+    quote="0x5678...", # Quote token address
+    price=3000000000000000000,  # Price in wei (3 ETH per token)
+    base_amount=1000000000000000000,  # Amount in wei (1 token)
+    is_maker=True,
+    n=1,
+    recipient=client.address
+)
+```
+
+#### Helper Functions for Wei Conversion
+
+Use the Web3 instance to convert between ETH and wei:
+
+```python
+# Convert ETH to wei
+amount_wei = client.w3.to_wei(1.5, "ether")  # 1.5 ETH
+
+# Convert wei to ETH
+amount_eth = client.w3.from_wei(1500000000000000000, "ether")  # Returns "1.5"
+```
+
 ## Use Cases
 
 The Standard Exchange Python API Client can be used for various purposes, including but not limited to:
@@ -110,6 +246,68 @@ The Standard Exchange Python API Client can be used for various purposes, includ
 ## Examples
 
 You can find example code in the `examples` folder. Here are some examples:
+
+### Complete Trading Example
+
+```python
+# examples/complete_trading.py
+import asyncio
+import os
+from dotenv import load_dotenv
+from standardweb3 import StandardClient
+
+async def main():
+    # Load environment variables
+    load_dotenv()
+
+    # Initialize the client
+    client = StandardClient(
+        private_key=os.getenv("PRIVATE_KEY"),
+        http_rpc_url=os.getenv("RPC_URL", "https://rpc.testnet.mode.network"),
+        networkName=os.getenv("NETWORK", "Somnia Testnet"),
+        api_url=None,
+        websocket_url=None
+    )
+
+    # Example token addresses (replace with actual addresses)
+    base_token = "0x1234567890123456789012345678901234567890"
+    quote_token = "0x0987654321098765432109876543210987654321"
+
+    try:
+        # 1. Market Buy Example
+        print("Executing market buy...")
+        quote_amount = client.w3.to_wei(0.1, "ether")  # 0.1 ETH
+        tx_receipt = await client.market_buy(
+            base=base_token,
+            quote=quote_token,
+            quote_amount=quote_amount,
+            is_maker=False,
+            n=1,
+            recipient=client.address,
+            slippageLimit=1000000  # 10% slippage
+        )
+        print(f"Market buy successful! TX: {tx_receipt['transactionHash'].hex()}")
+
+        # 2. Limit Sell Example
+        print("Placing limit sell order...")
+        price = client.w3.to_wei(2.0, "ether")  # 2 ETH per token
+        base_amount = client.w3.to_wei(0.5, "ether")  # 0.5 tokens
+        tx_receipt = await client.limit_sell(
+            base=base_token,
+            quote=quote_token,
+            price=price,
+            base_amount=base_amount,
+            is_maker=True,
+            n=1,
+            recipient=client.address
+        )
+        print(f"Limit sell placed! TX: {tx_receipt['transactionHash'].hex()}")
+
+    except Exception as e:
+        print(f"Trading failed: {e}")
+
+asyncio.run(main())
+```
 
 ### Fetch Order Book
 

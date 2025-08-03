@@ -42,8 +42,8 @@ async def simple_trading_example():
     print("-" * 40)
 
     # Example token addresses (replace with actual token addresses)
-    base_token = "0x0000000000000000000000000000000000000001"  # Token to buy/sell
-    quote_token = "0x0000000000000000000000000000000000000002"  # Token to spend/receive
+    base_token = "0x4A3BC48C156384f9564Fd65A53a2f3D534D8f2b7"  # Token to buy/sell
+    quote_token = "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Token to spend/receive
 
     # Example 1: Market Buy
     print("📈 Market Buy Example")

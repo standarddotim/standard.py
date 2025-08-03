@@ -1,6 +1,6 @@
 [project]
 name = "standardweb3"
-version = "0.0.0"
+version = "0.0.1"
 description = "Python Client for Standard"
 readme = "README.md"
 authors = [
