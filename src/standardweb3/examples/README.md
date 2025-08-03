@@ -36,7 +36,7 @@ PRIVATE_KEY=your_actual_private_key_here
 RPC_URL=https://rpc.testnet.mode.network
 
 # Network name
-NETWORK=Story Odyssey Testnet
+NETWORK=Somnia Testnet
 ```
 
 #### Option B: Using environment variables
@@ -44,7 +44,7 @@ NETWORK=Story Odyssey Testnet
 ```bash
 export PRIVATE_KEY="your_private_key_here"
 export RPC_URL="https://rpc.testnet.mode.network"
-export NETWORK="Story Odyssey Testnet"
+export NETWORK="Somnia Testnet"
 ```
 
 **⚠️ Security Warning**: Never commit your private key to version control. The `.env` file is gitignored for your security.
@@ -52,7 +52,7 @@ export NETWORK="Story Odyssey Testnet"
 ### 3. Configure Network Settings
 
 The examples use the following default settings:
-- **Network**: Story Odyssey Testnet
+- **Network**: Somnia Testnet
 - **RPC URL**: https://rpc.testnet.mode.network
 - **Matching Engine**: Automatically selected based on network
 
@@ -86,7 +86,7 @@ python trading.py
 🚀 Simple Trading Example
 ==============================
 Account: 0x1234...5678
-Network: Story Odyssey Testnet
+Network: Somnia Testnet
 Matching Engine: 0x8c1f7817657aae22e22ce84d552fe0c01bd8a254
 ----------------------------------------
 
@@ -155,8 +155,8 @@ To use a different network, modify the network parameter:
 # For Mode Mainnet
 NETWORK = "Mode Mainnet"
 
-# For Story Odyssey Testnet
-NETWORK = "Story Odyssey Testnet"
+# For Somnia Testnet
+NETWORK = "Somnia Testnet"
 ```
 
 ### Using Real Token Addresses

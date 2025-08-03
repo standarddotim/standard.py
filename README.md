@@ -122,7 +122,7 @@ async def main():
     client = StandardClient(
         private_key="your_private_key",
         http_rpc_url="https://your_rpc_url",
-        networkName="Story Odyssey Testnet",
+        networkName="Somnia Testnet",
         api_key="your_api_key"
     )
     orderbook = await client.fetch_orderbook(base="BASE_TOKEN", quote="QUOTE_TOKEN")
@@ -142,7 +142,7 @@ async def main():
     client = StandardClient(
         private_key="your_private_key",
         http_rpc_url="https://your_rpc_url",
-        networkName="Story Odyssey Testnet",
+        networkName="Somnia Testnet",
         api_key="your_api_key"
     )
     order_history = await client.fetch_user_account_order_history_paginated_with_limit(

@@ -30,7 +30,7 @@ class TradingExample:
         self,
         rpc_url: str,
         private_key: str,
-        network: str = "Story Odyssey Testnet",
+        network: str = "Somnia Testnet",
     ):
         """
         Initialize the trading example.
@@ -38,7 +38,7 @@ class TradingExample:
         Args:
             rpc_url: RPC endpoint URL
             private_key: Private key for signing transactions
-            network: Network name (default: Story Odyssey Testnet)
+            network: Network name (default: Somnia Testnet)
         """
         # Initialize StandardClient
         self.client = StandardClient(
@@ -299,10 +299,10 @@ class TradingExample:
         # These are example addresses - replace with actual token addresses
         # for your network
         example_base_token = (
-            "0x0000000000000000000000000000000000000001"  # Example token
+            "0x4A3BC48C156384f9564Fd65A53a2f3D534D8f2b7"  # Example token
         )
         example_quote_token = (
-            "0x0000000000000000000000000000000000000002"  # Example token
+            "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Example token
         )
 
         # Example 1: Market Buy
@@ -384,7 +384,7 @@ async def main():
     # Configuration - Replace with your actual values
     RPC_URL = os.getenv("RPC_URL", "https://rpc.testnet.mode.network")
     PRIVATE_KEY = os.getenv("PRIVATE_KEY", "")  # Your private key
-    NETWORK = os.getenv("NETWORK", "Story Odyssey Testnet")
+    NETWORK = os.getenv("NETWORK", "Somnia Testnet")
 
     if not PRIVATE_KEY:
         print("❌ Please set your PRIVATE_KEY environment variable")

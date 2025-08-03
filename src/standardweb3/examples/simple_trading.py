@@ -22,7 +22,7 @@ async def simple_trading_example():
     # Configuration
     RPC_URL = os.getenv("RPC_URL", "https://rpc.testnet.mode.network")
     PRIVATE_KEY = os.getenv("PRIVATE_KEY", "")
-    NETWORK = os.getenv("NETWORK", "Story Odyssey Testnet")
+    NETWORK = os.getenv("NETWORK", "Somnia Testnet")
 
     if not PRIVATE_KEY:
         print("❌ Please set your PRIVATE_KEY environment variable")
