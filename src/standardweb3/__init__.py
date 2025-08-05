@@ -30,10 +30,10 @@ class StandardClient:
         self,
         private_key: str,
         http_rpc_url: str,
-        networkName: str,
         matching_engine_address: str,
-        api_url: str,
-        websocket_url: str,
+        networkName: str = None,
+        api_url: str = None,
+        websocket_url: str = None,
         api_key: str = "defaultApiKey",
     ) -> None:
         """
@@ -45,6 +45,7 @@ class StandardClient:
             networkName: Network name (e.g., "Somnia Testnet")
             api_url: Custom API URL (optional)
             websocket_url: Custom WebSocket URL (optional)
+            matching_engine_address: Custom matching engine address (optional)
             api_key: API key for authentication
         """
         # Set default network if not provided
@@ -69,21 +70,22 @@ class StandardClient:
         else:
             self.websocket_url = websocket_urls[networkName]
 
-        # Check if networkName exists in matching_engine_addresses
-        if networkName not in matching_engine_addresses:
-            if matching_engine_address is None:
-                raise ValueError(
-                    "Invalid matching engine address: "
-                    "Matching engine address is not provided"
-                )
-            else:
-                self.matching_engine_address = matching_engine_address
+        # Determine matching engine address
+        if networkName in matching_engine_addresses:
+            self.matching_engine_address = matching_engine_addresses[networkName]
+        elif matching_engine_address is not None:
+            self.matching_engine_address = matching_engine_address
+        else:
+            raise ValueError(
+                f"Network '{networkName}' not found in supported networks "
+                "and no custom matching_engine_address provided"
+            )
 
         # Initialize contract functions
         self.contract = ContractFunctions(
             http_rpc_url,
             private_key,
-            matching_engine_addresses[networkName],
+            self.matching_engine_address,
             matching_engine_abi,
         )
 
