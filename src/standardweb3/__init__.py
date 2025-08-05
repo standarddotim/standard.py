@@ -31,6 +31,7 @@ class StandardClient:
         private_key: str,
         http_rpc_url: str,
         networkName: str,
+        matching_engine_address: str,
         api_url: str,
         websocket_url: str,
         api_key: str = "defaultApiKey",
@@ -70,9 +71,13 @@ class StandardClient:
 
         # Check if networkName exists in matching_engine_addresses
         if networkName not in matching_engine_addresses:
-            raise ValueError(
-                f"Network '{networkName}' not found in matching_engine_addresses"
-            )
+            if matching_engine_address is None:
+                raise ValueError(
+                    "Invalid matching engine address: "
+                    "Matching engine address is not provided"
+                )
+            else:
+                self.matching_engine_address = matching_engine_address
 
         # Initialize contract functions
         self.contract = ContractFunctions(
