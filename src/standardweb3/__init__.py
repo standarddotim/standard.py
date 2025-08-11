@@ -49,37 +49,29 @@ class StandardClient:
             api_key: API key for authentication
         """
         # Set default network if not provided
-        if networkName is None:
-            raise ValueError("Invalid Network Name: Network name is not provided")
-
-        # Check if the link from networkName exists in the api_urls
-        if networkName not in api_urls:
-            if api_url is None:
-                raise ValueError("Invalid api url: API url is not provided")
+        if networkName is not None:
+            if networkName not in matching_engine_addresses:
+                raise ValueError(
+                    f"Invalid Network Name: Network name {networkName} is not supported"
+                )
             else:
-                self.api_url = api_url
-        else:
-            self.api_url = api_urls[networkName]
-
-        # Check if the link from networkName exists in the websocket_urls
-        if networkName not in websocket_urls:
-            if websocket_url is None:
-                raise ValueError("Invalid websocket url: Websocket url is not provided")
+                self.matching_engine_address = matching_engine_addresses[networkName]
+            if networkName not in api_urls:
+                raise ValueError(
+                    f"Invalid Network Name: Network name {networkName} is not supported"
+                )
             else:
-                self.websocket_url = websocket_url
-        else:
-            self.websocket_url = websocket_urls[networkName]
+                self.api_url = api_urls[networkName]
+            if networkName not in websocket_urls:
+                raise ValueError(
+                    f"Invalid Network Name: Network name {networkName} is not supported"
+                )
+            else:
+                self.websocket_url = websocket_urls[networkName]
 
-        # Determine matching engine address
-        if networkName in matching_engine_addresses:
-            self.matching_engine_address = matching_engine_addresses[networkName]
-        elif matching_engine_address is not None:
-            self.matching_engine_address = matching_engine_address
-        else:
-            raise ValueError(
-                f"Network '{networkName}' not found in supported networks "
-                "and no custom matching_engine_address provided"
-            )
+        self.api_url = api_url
+        self.websocket_url = websocket_url
+        self.matching_engine_address = matching_engine_address
 
         # Initialize contract functions
         self.contract = ContractFunctions(
