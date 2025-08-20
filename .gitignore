@@ -11,3 +11,4 @@ build
 *.pyz
 uv.lock
 __pycache__
+.config

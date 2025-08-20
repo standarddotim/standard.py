@@ -14,13 +14,6 @@ from standardweb3.abis.matching_engine import matching_engine_abi
 from standardweb3.contract import ContractFunctions
 from standardweb3.api.query import APIFunctions
 from standardweb3.ws import WebsocketFunctions
-from standardweb3.types.orderbook import Orderbook
-from standardweb3.types.orderhistory import AccountOrderHistory
-from standardweb3.types.order import AccountOrders
-from standardweb3.types.pair import Pair, PairData
-from standardweb3.types.token import TokenData, TokenInfo
-from standardweb3.types.tradehistory import AccountTradeHistory
-from standardweb3.types.trade import TradesData
 
 
 class StandardClient:
@@ -130,13 +123,19 @@ class StandardClient:
     #########################################################
 
     # API functions
-    async def fetch_orderbook(self, base: str, quote: str) -> Orderbook:
-        """Fetch orderbook for a trading pair."""
-        return await self.api.fetch_orderbook(base, quote)
+    async def fetch_orderbook_ticks(self, base: str, quote: str, limit: int) -> dict:
+        """Fetch orderbook ticks for a trading pair."""
+        return await self.api.fetch_orderbook_ticks(base, quote, limit)
+
+    async def fetch_orderbook_blocks(
+        self, base: str, quote: str, step: int, depth: int, isSingle: bool
+    ) -> dict:
+        """Fetch orderbook blocks for a trading pair."""
+        return await self.api.fetch_orderbook_blocks(base, quote, step, depth, isSingle)
 
     async def fetch_account_order_history_paginated_with_limit(
         self, address: str, limit: int, page: int
-    ) -> AccountOrderHistory:
+    ) -> dict:
         """Fetch paginated order history for an account."""
         return await self.api.fetch_account_order_history_paginated_with_limit(
             address, limit, page
@@ -144,55 +143,55 @@ class StandardClient:
 
     async def fetch_account_orders_paginated_with_limit(
         self, address: str, limit: int, page: int
-    ) -> AccountOrders:
+    ) -> dict:
         """Fetch paginated active orders for an account."""
         return await self.api.fetch_account_orders_paginated_with_limit(
             address, limit, page
         )
 
-    async def fetch_all_pairs(self, limit: int, page: int) -> PairData:
+    async def fetch_all_pairs(self, limit: int, page: int) -> dict:
         """Fetch all trading pairs."""
         return await self.api.fetch_all_pairs(limit, page)
 
-    async def fetch_new_listing_pairs(self, limit: int, page: int) -> PairData:
+    async def fetch_new_listing_pairs(self, limit: int, page: int) -> dict:
         """Fetch newly listed trading pairs."""
         return await self.api.fetch_new_listing_pairs(limit, page)
 
-    async def fetch_pair_info(self, base: str, quote: str) -> Pair:
+    async def fetch_pair_info(self, base: str, quote: str) -> dict:
         """Fetch information for a specific trading pair."""
         return await self.api.fetch_pair_info(base, quote)
 
-    async def fetch_top_gainer_pairs(self, limit: int, page: int) -> PairData:
+    async def fetch_top_gainer_pairs(self, limit: int, page: int) -> dict:
         """Fetch top gaining trading pairs."""
         return await self.api.fetch_top_gainer_pairs(limit, page)
 
-    async def fetch_top_loser_pairs(self, limit: int, page: int) -> PairData:
+    async def fetch_top_loser_pairs(self, limit: int, page: int) -> dict:
         """Fetch top losing trading pairs."""
         return await self.api.fetch_top_loser_pairs(limit, page)
 
-    async def fetch_all_tokens(self, limit: int, page: int) -> TokenData:
+    async def fetch_all_tokens(self, limit: int, page: int) -> dict:
         """Fetch all available tokens."""
         return await self.api.fetch_all_tokens(limit, page)
 
-    async def fetch_new_listing_tokens(self, limit: int, page: int) -> TokenData:
+    async def fetch_new_listing_tokens(self, limit: int, page: int) -> dict:
         """Fetch newly listed tokens."""
         return await self.api.fetch_new_listing_tokens(limit, page)
 
-    async def fetch_top_gainer_tokens(self, limit: int, page: int) -> TokenData:
+    async def fetch_top_gainer_tokens(self, limit: int, page: int) -> dict:
         """Fetch top gaining tokens."""
         return await self.api.fetch_top_gainer_tokens(limit, page)
 
-    async def fetch_top_loser_tokens(self, limit: int, page: int) -> TokenData:
+    async def fetch_top_loser_tokens(self, limit: int, page: int) -> dict:
         """Fetch top losing tokens."""
         return await self.api.fetch_top_loser_tokens(limit, page)
 
-    async def fetch_token_info(self, address: str) -> TokenInfo:
+    async def fetch_token_info(self, address: str) -> dict:
         """Fetch information for a specific token."""
         return await self.api.fetch_token_info(address)
 
     async def fetch_account_trade_history_paginated_with_limit(
         self, address: str, limit: int, page: int
-    ) -> AccountTradeHistory:
+    ) -> dict:
         """Fetch paginated trade history for an account."""
         return await self.api.fetch_account_trade_history_paginated_with_limit(
             address, limit, page
@@ -200,13 +199,13 @@ class StandardClient:
 
     async def fetch_recent_overall_trades_paginated(
         self, limit: int, page: int
-    ) -> TradesData:
+    ) -> dict:
         """Fetch recent trades across all pairs."""
         return await self.api.fetch_recent_overall_trades_paginated(limit, page)
 
     async def fetch_recent_pair_trades_paginated(
         self, base: str, quote: str, limit: int, page: int
-    ) -> TradesData:
+    ) -> dict:
         """Fetch recent trades for a specific pair."""
         return await self.api.fetch_recent_pair_trades_paginated(
             base, quote, limit, page

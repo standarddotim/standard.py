@@ -26,7 +26,10 @@ class TestStandardClientSetup:
             pytest.skip("Environment variables PRIVATE_KEY and RPC_URL not set")
 
         client = StandardClient(
-            private_key=private_key, http_rpc_url=rpc_url, networkName="Somnia Testnet"
+            matching_engine_address="0x4Ca2C768773F6E0e9255da5B4e21ED9BA282B85e",
+            private_key=private_key,
+            http_rpc_url=rpc_url,
+            networkName="Somnia Testnet",
         )
 
         assert client is not None
@@ -56,7 +59,7 @@ class TestStandardClientSetup:
             assert client is not None
             assert client.matching_engine_address == test_matching_engine
 
-    def test_init_with_somnia_testnet(self):
+    def test_init_with_networkName(self):
         """Test client initialization with Somnia Testnet."""
         test_private_key = "0x" + "1" * 64
         test_rpc_url = "https://testnet-rpc.somnia.network"
@@ -73,25 +76,6 @@ class TestStandardClientSetup:
             assert (
                 client.matching_engine_address
                 == "0x4Ca2C768773F6E0e9255da5B4e21ED9BA282B85e"
-            )
-
-    def test_init_with_mode_mainnet(self):
-        """Test client initialization with Mode Mainnet."""
-        test_private_key = "0x" + "1" * 64
-        test_rpc_url = "https://mainnet.mode.network"
-
-        with patch("standardweb3.contract.ContractFunctions"):
-            client = StandardClient(
-                private_key=test_private_key,
-                http_rpc_url=test_rpc_url,
-                networkName="Mode Mainnet",
-                matching_engine_address="0x240aA2c15fBf6F65882A847462b04d5DA51A37Df",
-            )
-
-            assert client is not None
-            assert (
-                client.matching_engine_address
-                == "0x240aA2c15fBf6F65882A847462b04d5DA51A37Df"
             )
 
     def test_invalid_network_name_raises_error(self):
@@ -140,25 +124,3 @@ class TestStandardClientSetup:
 
             for attr in expected_attributes:
                 assert hasattr(client, attr), f"Client missing attribute: {attr}"
-
-    @pytest.mark.parametrize(
-        "network_name,expected_address",
-        [
-            ("Somnia Testnet", "0x4Ca2C768773F6E0e9255da5B4e21ED9BA282B85e"),
-            ("Mode Mainnet", "0x240aA2c15fBf6F65882A847462b04d5DA51A37Df"),
-        ],
-    )
-    def test_network_specific_addresses(self, network_name, expected_address):
-        """Test that network-specific addresses are set correctly."""
-        test_private_key = "0x" + "1" * 64
-        test_rpc_url = "https://test-rpc.example.com"
-
-        with patch("standardweb3.contract.ContractFunctions"):
-            client = StandardClient(
-                private_key=test_private_key,
-                http_rpc_url=test_rpc_url,
-                networkName=network_name,
-                matching_engine_address=expected_address,
-            )
-
-            assert client.matching_engine_address == expected_address

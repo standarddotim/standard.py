@@ -12,3 +12,4 @@ uv run pytest src/tests/ -v                    # Verbose output
 # Run specific test files
 uv run pytest src/tests/test_setup.py -v
 uv run pytest src/tests/test_contract.py -v
+uv run pytest src/tests/test_api.py -v
