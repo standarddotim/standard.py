@@ -285,6 +285,107 @@ class TradingExample:
             print(f"❌ Limit Sell failed: {str(e)}")
             raise
 
+    async def cancel_orders_example(self, orders_to_cancel: list):
+        """
+        Execute order cancellation example.
+
+        Args:
+            orders_to_cancel: List of order data dictionaries to cancel
+        """
+        print("🗑️  Executing Order Cancellation Example")
+        print(f"  Orders to cancel: {len(orders_to_cancel)}")
+
+        # Display orders being cancelled
+        for i, order in enumerate(orders_to_cancel):
+            print(f"  Order {i+1}:")
+            print(f"    Pair: {order['base'][:8]}.../{order['quote'][:8]}...")
+            print(f"    Type: {'Buy' if order['isBid'] else 'Sell'}")
+            print(f"    Order ID: {order['orderId']}")
+
+        try:
+            tx_receipt = await self.client.cancel_orders(orders_to_cancel)
+
+            print("✅ Order cancellation successful!")
+            print(f"  Transaction Hash: {tx_receipt['transactionHash'].hex()}")
+            print(f"  Gas Used: {tx_receipt['gasUsed']}")
+            print(f"  Status: {'Success' if tx_receipt['status'] == 1 else 'Failed'}")
+            print(f"  Orders cancelled: {len(orders_to_cancel)}")
+
+            return tx_receipt
+
+        except Exception as e:
+            print(f"❌ Order cancellation failed: {str(e)}")
+            raise
+
+    async def cancel_user_orders_example(self, account_address: str):
+        """
+        Practical example: Cancel actual orders from account history.
+
+        This shows how to:
+        1. Fetch active orders for an account
+        2. Select orders to cancel
+        3. Cancel them using the cancel_orders function
+
+        Args:
+            account_address: Address to fetch orders for
+        """
+        print("🔄 Practical Example: Cancel Real Orders")
+        print("-" * 40)
+
+        try:
+            # Step 1: Fetch active orders for the account
+            print("📋 Step 1: Fetching active orders...")
+            orders = await self.client.fetch_account_orders_paginated_with_limit(
+                account_address, limit=10, page=1
+            )
+
+            if isinstance(orders, dict) and orders.get("orders"):
+                active_orders = orders["orders"]
+            elif hasattr(orders, "orders"):
+                active_orders = orders.orders
+            else:
+                active_orders = []
+
+            if not active_orders:
+                print("  No active orders found to cancel")
+                return
+
+            print(f"  Found {len(active_orders)} active orders")
+
+            # Step 2: Prepare cancellation data from real orders
+            orders_to_cancel = []
+            for order in active_orders[:3]:  # Cancel up to 3 orders as example
+                # Extract order data - structure may vary based on API response
+                if isinstance(order, dict):
+                    order_data = {
+                        "base": order.get("baseToken", ""),
+                        "quote": order.get("quoteToken", ""),
+                        "isBid": order.get("side", "").lower() == "buy",
+                        "orderId": int(order.get("id", 0)),
+                    }
+                else:
+                    # If it's an object with attributes
+                    order_data = {
+                        "base": getattr(order, "baseToken", ""),
+                        "quote": getattr(order, "quoteToken", ""),
+                        "isBid": getattr(order, "side", "").lower() == "buy",
+                        "orderId": int(getattr(order, "id", 0)),
+                    }
+
+                orders_to_cancel.append(order_data)
+
+            print(
+                f"📝 Step 2: Prepared {len(orders_to_cancel)} orders for cancellation"
+            )
+
+            # Step 3: Cancel the orders
+            print("🗑️  Step 3: Cancelling orders...")
+            await self.cancel_orders_example(orders_to_cancel)
+
+        except Exception as e:
+            print(f"❌ Practical cancel orders example failed: {str(e)}")
+            print("💡 This is normal if there are no active orders to cancel")
+
     async def run_trading_examples(self):
         """Execute a series of trading examples."""
         print("🚀 Starting Trading Examples")
@@ -371,6 +472,55 @@ class TradingExample:
             )
         except Exception as e:
             print(f"Limit sell example failed: {e}")
+        print()
+
+        # Example 5: Cancel Orders
+        print("🗑️  Example 5: Cancel Orders")
+        print("-" * 30)
+        try:
+            # Example order cancellation data
+            # In a real scenario, you would get these order IDs from:
+            # 1. Previous order placements
+            # 2. Account order history API calls
+            # 3. User input
+            example_orders_to_cancel = [
+                {
+                    "base": example_base_token,
+                    "quote": example_quote_token,
+                    "isBid": True,  # Cancel a buy order
+                    "orderId": 12345,  # Replace with actual order ID
+                },
+                {
+                    "base": example_base_token,
+                    "quote": example_quote_token,
+                    "isBid": False,  # Cancel a sell order
+                    "orderId": 12346,  # Replace with actual order ID
+                },
+            ]
+
+            print("⚠️  Note: This example uses dummy order IDs.")
+            print("   In practice, you would get real order IDs from:")
+            print("   - Previous limit order transactions")
+            print("   - Account order history API calls")
+            print("   - User interface interactions")
+            print()
+
+            await self.cancel_orders_example(example_orders_to_cancel)
+
+        except Exception as e:
+            print(f"Cancel orders example failed: {e}")
+            print("💡 This is expected if the order IDs don't exist on-chain")
+        print()
+
+        # Example 6: Practical Cancel Orders (using real order data)
+        print("🔄 Example 6: Practical Cancel Orders")
+        print("-" * 30)
+        try:
+            print("This example shows how to cancel real orders from your account.")
+            await self.cancel_user_orders_example(self.client.address)
+        except Exception as e:
+            print(f"Practical cancel orders example failed: {e}")
+            print("💡 This is normal if you have no active orders")
         print()
 
         print("✅ Trading examples completed!")

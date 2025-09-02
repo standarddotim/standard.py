@@ -120,6 +120,10 @@ class StandardClient:
             base, quote, price, base_amount, is_maker, n, recipient
         )
 
+    async def cancel_orders(self, cancel_order_data: list) -> str:
+        """Cancel multiple orders."""
+        return await self.contract.cancel_orders(cancel_order_data)
+
     #########################################################
 
     # API functions

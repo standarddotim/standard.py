@@ -198,3 +198,66 @@ class ContractFunctions:
             n,
             recipient,
         )
+
+    async def cancel_orders(self, cancel_order_data: list) -> str:
+        """
+        Cancel multiple orders.
+
+        Args:
+            cancel_order_data: List of dictionaries containing order cancellation data.
+                Each dictionary should have:
+                - base (str): Base token address
+                - quote (str): Quote token address
+                - isBid (bool): True for buy orders, False for sell orders
+                - orderId (int): Order ID to cancel
+
+        Returns:
+            str: Transaction hash
+
+        Example:
+            cancel_data = [
+                {
+                    "base": "0x...",
+                    "quote": "0x...",
+                    "isBid": True,
+                    "orderId": 12345
+                },
+                {
+                    "base": "0x...",
+                    "quote": "0x...",
+                    "isBid": False,
+                    "orderId": 12346
+                }
+            ]
+            tx_hash = await contract.cancel_orders(cancel_data)
+        """
+        # Validate input
+        if not isinstance(cancel_order_data, list):
+            raise ValueError("cancel_order_data must be a list")
+
+        if not cancel_order_data:
+            raise ValueError("cancel_order_data cannot be empty")
+
+        # Process and validate each cancel order input
+        processed_data = []
+        for i, order_data in enumerate(cancel_order_data):
+            if not isinstance(order_data, dict):
+                raise ValueError(f"Order data at index {i} must be a dictionary")
+
+            required_fields = ["base", "quote", "isBid", "orderId"]
+            for field in required_fields:
+                if field not in order_data:
+                    raise ValueError(
+                        f"Missing required field '{field}' in order data at index {i}"
+                    )
+
+            # Ensure proper types for contract call
+            processed_order = (
+                Web3.to_checksum_address(order_data["base"]),
+                Web3.to_checksum_address(order_data["quote"]),
+                bool(order_data["isBid"]),
+                int(order_data["orderId"]),
+            )
+            processed_data.append(processed_order)
+
+        return await self._execute_transaction("cancelOrders", processed_data)

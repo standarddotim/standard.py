@@ -382,7 +382,7 @@ class TestAPIIntegration:
         """Test fetching account orders from real API."""
         try:
             # Use a dummy address - this should return empty results but not error
-            test_address = "0x742d35Cc6531C1532c5FdE4d62DeC19b7b3A0087"
+            test_address = "0xF8FB4672170607C95663f4Cc674dDb1386b7CfE0"
 
             result = await real_client.fetch_account_orders_paginated_with_limit(
                 test_address, limit=5, page=1
@@ -423,7 +423,7 @@ class TestAPIIntegration:
                 real_client.fetch_all_tokens(5, 1),
                 real_client.fetch_top_gainer_pairs(3, 1),
                 real_client.fetch_account_orders_paginated_with_limit(
-                    "0x742d35Cc6531C1532c5FdE4d62DeC19b7b3A0087", 5, 1
+                    "0xF8FB4672170607C95663f4Cc674dDb1386b7CfE0", 5, 1
                 ),
                 return_exceptions=True,
             )
