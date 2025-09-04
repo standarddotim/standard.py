@@ -1,4 +1,4 @@
-matching_engine_abi = [
+matching_engine_abi = matching_engine_abi = [
     {"type": "constructor", "inputs": [], "stateMutability": "nonpayable"},
     {"type": "receive", "stateMutability": "payable"},
     {
