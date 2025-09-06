@@ -66,19 +66,6 @@ class StandardClient:
         self.websocket_url = websocket_url
         self.matching_engine_address = matching_engine_address
 
-        # Initialize contract functions
-        self.contract = ContractFunctions(
-            http_rpc_url,
-            private_key,
-            self.matching_engine_address,
-            matching_engine_abi,
-        )
-
-        # Expose commonly used attributes from contract
-        self.w3 = self.contract.w3
-        self.address = self.contract.address
-        self.account = self.contract.account
-
         # Initialize api functions
         self.api = APIFunctions(self.api_url, api_key)
 
@@ -105,6 +92,20 @@ class StandardClient:
         self._base_quote = {}
         for pair in self._pairs:
             self._base_quote[pair.id] = {"base": pair.base, "quote": pair.quote}
+
+        # Initialize contract functions
+        self.contract = ContractFunctions(
+            http_rpc_url,
+            private_key,
+            self.matching_engine_address,
+            matching_engine_abi,
+            self._base_quote,
+        )
+
+        # Expose commonly used attributes from contract
+        self.w3 = self.contract.w3
+        self.address = self.contract.address
+        self.account = self.contract.account
 
     @property
     def pairs(self):

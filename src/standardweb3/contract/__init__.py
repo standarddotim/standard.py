@@ -19,6 +19,7 @@ class ContractFunctions:
         private_key: str,
         matching_engine: str,
         matching_engine_abi: dict,
+        base_quote: dict,
     ):
         """
         Initialize contract functions.
@@ -193,8 +194,8 @@ class ContractFunctions:
                 print(f"      Order ID: {log['args']['id']}")
                 print(f"      Price: {log['args']['price']}")
                 print(f"      Amount Placed: {log['args']['placed']}")
-                base = log["args"]["base"]
-                quote = log["args"]["quote"]
+                base = self.base_quote[log["args"]["pair"]]["base"]
+                quote = self.base_quote[log["args"]["pair"]]["quote"]
                 is_bid = log["args"]["isBid"]
                 order_id = log["args"]["orderId"]
                 order_info["id"] = f"{base}_{quote}_{is_bid}_{order_id}"
@@ -216,10 +217,10 @@ class ContractFunctions:
                 # NewMarketPrice event has 'pair' instead of 'base' and 'quote'
                 if "pair" in log["args"]:
                     print(f"      Pair: {log['args']['pair']}")
-                if "base" in log["args"]:
-                    print(f"      Base Token: {log['args']['base']}")
-                if "quote" in log["args"]:
-                    print(f"      Quote Token: {log['args']['quote']}")
+                base = self.base_quote[log["args"]["pair"]]["base"]
+                quote = self.base_quote[log["args"]["pair"]]["quote"]
+                print(f"      Base Token: {base}")
+                print(f"      Quote Token: {quote}")
             elif log["event"] == "PairAdded":
                 if "pair" in log["args"]:
                     print(f"      Pair Address: {log['args']['pair']}")
@@ -422,6 +423,7 @@ class ContractFunctions:
                 - amount: int, amount in wei
                 - n: int, number parameter
                 - recipient: address of recipient
+                - isETH: bool, True for ETH orders, False for token orders
 
         Returns:
             dict: Transaction result with tx_hash, gas_used, status, decoded_logs
@@ -438,7 +440,8 @@ class ContractFunctions:
                     "price": 1000000000000000000,
                     "amount": 1000000000000000000,
                     "n": 1,
-                    "recipient": "0x..."
+                    "recipient": "0x...",
+                    "isETH": False,
                 }
             ]
             result = await contract.create_orders(create_data)
@@ -452,6 +455,7 @@ class ContractFunctions:
 
         # Process and validate each create order input
         processed_data = []
+        eth_amount = 0
         for i, order_data in enumerate(create_order_data):
             if not isinstance(order_data, dict):
                 raise ValueError(f"Order data at index {i} must be a dictionary")
@@ -491,11 +495,16 @@ class ContractFunctions:
                 int(order_data["amount"]),
                 int(order_data["n"]),
                 Web3.to_checksum_address(order_data["recipient"]),
+                bool(order_data["isETH"]),
             )
 
             processed_data.append(processed_order)
+            if order_data["isETH"]:
+                eth_amount += int(order_data["amount"])
 
-        return await self._execute_transaction("createOrders", processed_data)
+        return await self._execute_transaction(
+            "createOrders", processed_data, eth_amount=eth_amount
+        )
 
     async def update_orders(self, update_order_data: list) -> dict:
         """
@@ -513,6 +522,7 @@ class ContractFunctions:
                 - amount: int, amount in wei
                 - n: int, number parameter
                 - recipient: address of recipient
+                - isETH: bool, True for ETH orders, False for token orders
 
         Returns:
             dict: Transaction result with tx_hash, gas_used, status, decoded_logs
@@ -528,7 +538,8 @@ class ContractFunctions:
                     "price": 2000000000000000000,
                     "amount": 1000000000000000000,
                     "n": 1,
-                    "recipient": "0x..."
+                    "recipient": "0x...",
+                    "isETH": False,
                 }
             ]
             result = await contract.update_orders(update_data)
@@ -542,6 +553,7 @@ class ContractFunctions:
 
         # Process and validate each update order input
         processed_data = []
+        eth_amount = 0
         for i, order_data in enumerate(update_order_data):
             if not isinstance(order_data, dict):
                 raise ValueError(f"Order data at index {i} must be a dictionary")
@@ -557,6 +569,7 @@ class ContractFunctions:
                 "amount",
                 "n",
                 "recipient",
+                "isETH",
             ]
 
             for field in required_fields:
@@ -576,11 +589,16 @@ class ContractFunctions:
                 int(order_data["amount"]),
                 int(order_data["n"]),
                 Web3.to_checksum_address(order_data["recipient"]),
+                bool(order_data["isETH"]),
             )
 
             processed_data.append(processed_order)
+            if order_data["isETH"]:
+                eth_amount += int(order_data["amount"])
 
-        return await self._execute_transaction("updateOrders", processed_data)
+        return await self._execute_transaction(
+            "updateOrders", processed_data, eth_amount=eth_amount
+        )
 
     async def cancel_orders(self, cancel_order_data: list) -> str:
         """
