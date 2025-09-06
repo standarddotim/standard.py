@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Simple Trading Example using StandardWeb3 Contract Functions.
+ETH Trading Example using StandardWeb3.
 
-This is a minimal example showing how to use the contract functions
-for basic trading operations.
+This example demonstrates how to use the ETH-specific trading functions
+that allow direct trading with ETH without needing WETH.
 """
 
 import asyncio
@@ -14,8 +14,8 @@ from dotenv import load_dotenv
 from standardweb3 import StandardClient
 
 
-async def simple_trading_example():
-    """Demonstrate simple contract function usage for trading."""
+async def match_trade():
+    """Demonstrate ETH-specific trading functions."""
     # Load environment variables from .env file
     load_dotenv()
 
@@ -40,25 +40,11 @@ async def simple_trading_example():
 
     print(f"Account: {client.contract.address}")
     print(f"Network: {NETWORK}")
-    print("-" * 40)
+    print("-" * 50)
 
-    # Fetch and display tokens
-    try:
-        tokens = client.tokens
-        print(f"Tokens: {tokens}")
-        print(f"Available tokens: {len(tokens) if tokens else 0}")
-        if tokens and len(tokens) > 0:
-            print("First few tokens:")
-            for token in tokens[:3]:  # Show first 3 tokens
-                print(
-                    f"  - {token.get('symbol', 'N/A')}: {token.get('address', 'N/A')}"
-                )
-    except Exception as e:
-        print(f"Could not fetch tokens: {e}")
-
-    # Example token addresses (replace with actual token addresses)
-    base_token = "0x4A3BC48C156384f9564Fd65A53a2f3D534D8f2b7"  # Token to buy/sell
-    quote_token = "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Token to spend/receive
+    # Example token addresses
+    base_token = "0x4A3BC48C156384f9564Fd65A53a2f3D534D8f2b7"  # Token to buy with ETH
+    quote_token = "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Token to receive
 
     # Example 1: Market Buy
     print("📈 Market Buy Example")
@@ -114,73 +100,36 @@ async def simple_trading_example():
 
     print()
 
-    # Example 2: Limit Buy
-    print("💰 Limit Buy Example")
+    # Example 2: Market Sell ETH
+    print("📉 Market Sell ETH Example")
     try:
-        price = 100000000  # 0.1 ETH per token
-        quote_amount = 100000000  # 0.01 ETH
-        result = await client.limit_buy(
-            base=base_token,
+        quote_token = "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Token to receive
+        eth_amount = client.w3.to_wei(0.005, "ether")  # Sell 0.005 ETH
+
+        result = await client.market_sell_eth(
             quote=quote_token,
-            price=price,
-            quote_amount=quote_amount,
-            is_maker=True,
-            n=20,
+            is_maker=False,
+            n=1,
             recipient=client.address,
+            slippage_limit=10000000,  # 10% slippage
+            eth_amount=eth_amount,
         )
-        print("✅ Limit buy successful!")
+
+        print("✅ Market sell ETH successful!")
         print(f"  TX Hash: {result['tx_hash']}")
-        event_count = len(result["decoded_logs"]) if result["decoded_logs"] else 0
-        print(f"  Events: {event_count} decoded")
+        print(f"  Gas Used: {result['gas_used']}")
+        print(f"  ETH Sold: {client.w3.from_wei(eth_amount, 'ether')} ETH")
+
     except Exception as e:
-        print(f"❌ Limit buy failed: {e}")
+        print(f"❌ Market sell ETH failed: {e}")
 
     print()
-
-    # Example 3: Market Sell
-    print("📉 Market Sell Example")
-    try:
-        base_amount = 100000000  # 0.001 tokens
-        result = await client.market_sell(
-            base=base_token,
-            quote=quote_token,
-            base_amount=base_amount,
-            is_maker=True,
-            n=20,
-            recipient=client.address,
-            slippageLimit=10000000,
-        )
-        print("✅ Market sell successful! TX: {result}")
-    except Exception as e:
-        print(f"❌ Market sell failed: {e}")
-
-    print()
-
-    # Example 4: Limit Sell
-    print("💸 Limit Sell Example")
-    try:
-        price = 100000000  # 0.15 ETH per token
-        base_amount = 100000000  # 0.01 tokens
-        result = await client.limit_sell(
-            base=base_token,
-            quote=quote_token,
-            price=price,
-            base_amount=base_amount,
-            is_maker=True,
-            n=20,
-            recipient=client.address,
-        )
-        print(f"✅ Limit sell successful! TX: {result}")
-    except Exception as e:
-        print(f"❌ Limit sell failed: {e}")
+    print("✅ ETH trading examples completed!")
 
 
 async def main():
-    """Run the simple trading example."""
-    print("🚀 Simple Trading Example")
-    print("=" * 30)
-    await simple_trading_example()
-    print("\n✅ Example completed!")
+    """Run the ETH trading example."""
+    await match_trade()
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ API endpoints, including orderbook, orders, pairs, tokens, and trade data.
 """
 
 import aiohttp
+import http.client
 import os
 import web3
 
@@ -118,6 +119,20 @@ class APIFunctions:
 
                 return data
 
+    def fetch_all_pairs_sync(self, limit: int, page: int) -> dict:
+        """Fetch all trading pairs."""
+        with http.client.HTTPSConnection(self.api_url) as connection:
+            connection.request(
+                "GET",
+                f"/api/pairs/{limit}/{page}",
+                headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": os.getenv("ADMIN_API_KEY", ""),
+                },
+            )
+            response = connection.getresponse()
+            return response.json()
+
     async def fetch_all_pairs(self, limit: int, page: int) -> dict:
         """Fetch all trading pairs."""
         async with aiohttp.ClientSession() as session:
@@ -219,6 +234,31 @@ class APIFunctions:
                 data = await response.json()
 
                 return data
+
+    def fetch_all_tokens_sync(self, limit: int, page: int) -> dict:
+        """Fetch all available tokens by symbol."""
+        from urllib.parse import urlparse
+        import json
+
+        # Parse the URL to extract just the hostname
+        parsed_url = urlparse(self.api_url)
+        host = parsed_url.netloc
+
+        connection = http.client.HTTPSConnection(host)
+        try:
+            connection.request(
+                "GET",
+                f"/api/tokens/{limit}/{page}",
+                headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": os.getenv("ADMIN_API_KEY", ""),
+                },
+            )
+            response = connection.getresponse()
+            data = response.read().decode("utf-8")
+            return json.loads(data)
+        finally:
+            connection.close()
 
     async def fetch_all_tokens(self, limit: int, page: int) -> dict:
         """Fetch all available tokens."""

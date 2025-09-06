@@ -85,6 +85,42 @@ class StandardClient:
         # Initialize websocket functions
         self.ws = WebsocketFunctions(None, self.websocket_url)
 
+        # Initialize token data (will be loaded lazily)
+        try:
+            token_data = self.api.fetch_all_tokens_sync(100, 1)
+            self._tokens = token_data.get("tokens", []) if token_data else []
+        except Exception as e:
+            print(f"Warning: Could not fetch tokens during initialization: {e}")
+            self._tokens = []
+
+        # Initialize pair data (will be loaded lazily)
+        try:
+            pair_data = self.api.fetch_all_pairs_sync(100, 1)
+            self._pairs = pair_data.get("pairs", []) if pair_data else []
+        except Exception as e:
+            print(f"Warning: Could not fetch pairs during initialization: {e}")
+            self._pairs = []
+
+        # get base and quote from pairs
+        self._base_quote = {}
+        for pair in self._pairs:
+            self._base_quote[pair.id] = {"base": pair.base, "quote": pair.quote}
+
+    @property
+    def pairs(self):
+        """Get the loaded pairs."""
+        return self._pairs
+
+    @property
+    def tokens(self):
+        """Get the loaded tokens."""
+        return self._tokens
+
+    @property
+    def base_quote(self):
+        """Get the loaded base and quote."""
+        return self._base_quote
+
     #########################################################
 
     # Contract functions
@@ -123,6 +159,43 @@ class StandardClient:
     async def cancel_orders(self, cancel_order_data: list) -> str:
         """Cancel multiple orders."""
         return await self.contract.cancel_orders(cancel_order_data)
+
+    # Synchronous trading methods
+    def market_buy_sync(
+        self, base, quote, quote_amount, is_maker, n, recipient, slippageLimit
+    ) -> str:
+        """Execute a market buy order synchronously."""
+        return self.contract.market_buy_sync(
+            base, quote, quote_amount, is_maker, n, recipient, slippageLimit
+        )
+
+    def market_sell_sync(
+        self, base, quote, base_amount, is_maker, n, recipient, slippageLimit
+    ) -> str:
+        """Execute a market sell order synchronously."""
+        return self.contract.market_sell_sync(
+            base, quote, base_amount, is_maker, n, recipient, slippageLimit
+        )
+
+    def limit_buy_sync(
+        self, base, quote, price, quote_amount, is_maker, n, recipient
+    ) -> str:
+        """Execute a limit buy order synchronously."""
+        return self.contract.limit_buy_sync(
+            base, quote, price, quote_amount, is_maker, n, recipient
+        )
+
+    def limit_sell_sync(
+        self, base, quote, price, base_amount, is_maker, n, recipient
+    ) -> str:
+        """Execute a limit sell order synchronously."""
+        return self.contract.limit_sell_sync(
+            base, quote, price, base_amount, is_maker, n, recipient
+        )
+
+    def cancel_orders_sync(self, cancel_order_data: list) -> str:
+        """Cancel multiple orders synchronously."""
+        return self.contract.cancel_orders_sync(cancel_order_data)
 
     #########################################################
 
