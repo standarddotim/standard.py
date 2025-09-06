@@ -126,7 +126,10 @@ class ContractFunctions:
                 if len(order_infos) == 1:
                     result["order_info"] = order_infos[0]
                 else:
-                    result["order_infos"] = order_infos
+                    if len(order_infos) == 0:
+                        result["order_info"] = None
+                    else:
+                        result["order_infos"] = order_infos
 
                 return result
             else:
@@ -186,50 +189,66 @@ class ContractFunctions:
 
     def _parse_decoded_logs(self, decoded_logs):
         """Parse decoded logs."""
-        order_info = {}
-        order_infos = []
-        for log in decoded_logs:
-            print(f"📊 Decoded {log['event']}: {log['args']}")
-            if log["event"] == "OrderPlaced":
-                print(f"      Order ID: {log['args']['id']}")
-                print(f"      Price: {log['args']['price']}")
-                print(f"      Amount Placed: {log['args']['placed']}")
-                base = self.base_quote[log["args"]["pair"]]["base"]
-                quote = self.base_quote[log["args"]["pair"]]["quote"]
-                is_bid = log["args"]["isBid"]
-                order_id = log["args"]["orderId"]
-                order_info["id"] = f"{base}_{quote}_{is_bid}_{order_id}"
-                order_info["price"] = log["args"]["price"]
-                order_info["amount"] = log["args"]["placed"]
-                # if there are multiple orders placed, add them to order_info
-                order_infos.append(order_info)
-                order_info = {}
-            elif log["event"] == "OrderMatched":
-                print(f"      Order ID: {log['args']['id']}")
-                print(f"      Price: {log['args']['price']}")
-                print(f"      Total: {log['args']['total']}")
-            elif log["event"] == "OrderCanceled":
-                print(f"      Order ID: {log['args']['id']}")
-                print(f"      Price: {log['args']['price']}")
-                print(f"      Amount Canceled: {log['args']['amount']}")
-            elif log["event"] == "NewMarketPrice":
-                print(f"      Price: {log['args']['price']}")
-                # NewMarketPrice event has 'pair' instead of 'base' and 'quote'
-                if "pair" in log["args"]:
-                    print(f"      Pair: {log['args']['pair']}")
-                base = self.base_quote[log["args"]["pair"]]["base"]
-                quote = self.base_quote[log["args"]["pair"]]["quote"]
-                print(f"      Base Token: {base}")
-                print(f"      Quote Token: {quote}")
-            elif log["event"] == "PairAdded":
-                if "pair" in log["args"]:
-                    print(f"      Pair Address: {log['args']['pair']}")
-                if "base" in log["args"]:
-                    print(f"      Base Token: {log['args']['base']}")
-                if "quote" in log["args"]:
-                    print(f"      Quote Token: {log['args']['quote']}")
+        try:
+            order_info = {}
+            order_infos = []
+            for i, log in enumerate(decoded_logs):
+                print(
+                    f"📊 Decoded {log['event']} ({i}/{len(decoded_logs)}): {log['args']}"
+                )
+                if log["event"] == "OrderPlaced":
+                    # you must make pair to lowercase to match with api
+                    pair_lowercase = log["args"]["pair"].lower()
+                    print(f"      Order ID: {log['args']['id']}")
+                    print(f"      Price: {log['args']['price']}")
+                    print(f"      Amount Placed: {log['args']['placed']}")
+                    print(f"      Pair: {pair_lowercase}")
+                    print(f"      Base: {self.base_quote[pair_lowercase]['base']}")
+                    print(f"      Quote: {self.base_quote[pair_lowercase]['quote']}")
+                    base = self.base_quote[pair_lowercase]["base"]
+                    quote = self.base_quote[pair_lowercase]["quote"]
+                    is_bid = log["args"]["isBid"]
+                    order_id = log["args"]["orderId"]
+                    order_info["id"] = f"{base}_{quote}_{is_bid}_{order_id}"
+                    order_info["price"] = log["args"]["price"]
+                    order_info["amount"] = log["args"]["placed"]
+                    # if there are multiple orders placed, add them to order_info
+                    order_infos.append(order_info)
+                    order_info = {}
+                elif log["event"] == "OrderMatched":
+                    print(f"      Order ID: {log['args']['id']}")
+                    print(f"      Price: {log['args']['price']}")
+                    print(f"      Total: {log['args']['total']}")
+                elif log["event"] == "OrderCanceled":
+                    print(f"      Order ID: {log['args']['id']}")
+                    print(f"      Price: {log['args']['price']}")
+                    print(f"      Amount Canceled: {log['args']['amount']}")
+                elif log["event"] == "NewMarketPrice":
+                    pair_lowercase = log["args"]["pair"].lower()
+                    print(f"      Price: {log['args']['price']}")
+                    # NewMarketPrice event has 'pair' instead of 'base' and 'quote'
+                    print(f"      Pair: {pair_lowercase}")
+                    base = self.base_quote[pair_lowercase]["base"]
+                    quote = self.base_quote[pair_lowercase]["quote"]
+                    print(f"      Base Token: {base}")
+                    print(f"      Quote Token: {quote}")
+                elif log["event"] == "PairAdded":
+                    if "pair" in log["args"]:
+                        pair_lowercase = log["args"]["pair"].lower()
+                        print(f"      Pair: {pair_lowercase}")
+                        base = self.base_quote[pair_lowercase]["base"]
+                        quote = self.base_quote[pair_lowercase]["quote"]
+                        print(f"      Base Token: {base}")
+                        print(f"      Quote Token: {quote}")
 
-        return order_infos[0] if len(order_infos) == 1 else order_infos
+            return (
+                order_infos[0]
+                if len(order_infos) == 1
+                else [] if len(order_infos) == 0 else order_infos
+            )
+        except Exception as e:
+            print(f"Error in _parse_decoded_logs: {e}")
+            return []
 
     async def market_buy(
         self, base, quote, quote_amount, is_maker, n, recipient, slippageLimit

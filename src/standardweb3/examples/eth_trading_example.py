@@ -110,7 +110,7 @@ async def eth_trading_example():
     print("💸 Limit Sell ETH Example")
     try:
         quote_token = "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Token to receive
-        price = client.w3.to_wei(1000, "ether")  # 1000 tokens per ETH
+        price = 38600000000  # 1000 tokens per ETH
         eth_amount = client.w3.to_wei(0.01, "ether")  # Sell 0.01 ETH
 
         result = await client.limit_sell_eth(

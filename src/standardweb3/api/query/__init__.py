@@ -121,7 +121,15 @@ class APIFunctions:
 
     def fetch_all_pairs_sync(self, limit: int, page: int) -> dict:
         """Fetch all trading pairs."""
-        with http.client.HTTPSConnection(self.api_url) as connection:
+        from urllib.parse import urlparse
+        import json
+
+        # Parse the URL to extract just the hostname
+        parsed_url = urlparse(self.api_url)
+        host = parsed_url.netloc
+
+        connection = http.client.HTTPSConnection(host)
+        try:
             connection.request(
                 "GET",
                 f"/api/pairs/{limit}/{page}",
@@ -131,7 +139,10 @@ class APIFunctions:
                 },
             )
             response = connection.getresponse()
-            return response.json()
+            data = response.read().decode("utf-8")
+            return json.loads(data)
+        finally:
+            connection.close()
 
     async def fetch_all_pairs(self, limit: int, page: int) -> dict:
         """Fetch all trading pairs."""

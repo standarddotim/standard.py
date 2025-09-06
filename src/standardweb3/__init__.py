@@ -91,7 +91,9 @@ class StandardClient:
         # get base and quote from pairs
         self._base_quote = {}
         for pair in self._pairs:
-            self._base_quote[pair.id] = {"base": pair.base, "quote": pair.quote}
+            base_id = pair["base"]["id"]
+            quote_id = pair["quote"]["id"]
+            self._base_quote[pair["id"]] = {"base": base_id, "quote": quote_id}
 
         # Initialize contract functions
         self.contract = ContractFunctions(
@@ -99,7 +101,7 @@ class StandardClient:
             private_key,
             self.matching_engine_address,
             matching_engine_abi,
-            self._base_quote,
+            base_quote=self._base_quote,
         )
 
         # Expose commonly used attributes from contract
