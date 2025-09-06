@@ -157,46 +157,46 @@ class StandardClient:
             base, quote, price, base_amount, is_maker, n, recipient
         )
 
+    async def create_orders(self, create_order_data: list) -> dict:
+        """Create multiple orders."""
+        return await self.contract.create_orders(create_order_data)
+
+    async def update_orders(self, update_order_data: list) -> dict:
+        """Update multiple orders."""
+        return await self.contract.update_orders(update_order_data)
+
     async def cancel_orders(self, cancel_order_data: list) -> str:
         """Cancel multiple orders."""
         return await self.contract.cancel_orders(cancel_order_data)
 
-    # Synchronous trading methods
-    def market_buy_sync(
-        self, base, quote, quote_amount, is_maker, n, recipient, slippageLimit
-    ) -> str:
-        """Execute a market buy order synchronously."""
-        return self.contract.market_buy_sync(
-            base, quote, quote_amount, is_maker, n, recipient, slippageLimit
+    # ETH-specific trading functions
+    async def limit_buy_eth(self, base, price, is_maker, n, recipient, eth_amount):
+        """Execute a limit buy order using ETH as quote token."""
+        return await self.contract.limit_buy_eth(
+            base, price, is_maker, n, recipient, eth_amount
         )
 
-    def market_sell_sync(
-        self, base, quote, base_amount, is_maker, n, recipient, slippageLimit
-    ) -> str:
-        """Execute a market sell order synchronously."""
-        return self.contract.market_sell_sync(
-            base, quote, base_amount, is_maker, n, recipient, slippageLimit
+    async def limit_sell_eth(self, quote, price, is_maker, n, recipient, eth_amount):
+        """Execute a limit sell order selling ETH for quote tokens."""
+        return await self.contract.limit_sell_eth(
+            quote, price, is_maker, n, recipient, eth_amount
         )
 
-    def limit_buy_sync(
-        self, base, quote, price, quote_amount, is_maker, n, recipient
-    ) -> str:
-        """Execute a limit buy order synchronously."""
-        return self.contract.limit_buy_sync(
-            base, quote, price, quote_amount, is_maker, n, recipient
+    async def market_buy_eth(
+        self, base, is_maker, n, recipient, slippage_limit, eth_amount
+    ):
+        """Execute a market buy order using ETH as quote token."""
+        return await self.contract.market_buy_eth(
+            base, is_maker, n, recipient, slippage_limit, eth_amount
         )
 
-    def limit_sell_sync(
-        self, base, quote, price, base_amount, is_maker, n, recipient
-    ) -> str:
-        """Execute a limit sell order synchronously."""
-        return self.contract.limit_sell_sync(
-            base, quote, price, base_amount, is_maker, n, recipient
+    async def market_sell_eth(
+        self, quote, is_maker, n, recipient, slippage_limit, eth_amount
+    ):
+        """Execute a market sell order selling ETH for quote tokens."""
+        return await self.contract.market_sell_eth(
+            quote, is_maker, n, recipient, slippage_limit, eth_amount
         )
-
-    def cancel_orders_sync(self, cancel_order_data: list) -> str:
-        """Cancel multiple orders synchronously."""
-        return self.contract.cancel_orders_sync(cancel_order_data)
 
     #########################################################
 

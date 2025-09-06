@@ -48,6 +48,7 @@ class ContractFunctions:
         self.private_key = private_key
         self.matching_engine = matching_engine
         self.matching_engine_abi = matching_engine_abi
+        self.base_quote = base_quote
 
     def get_contract(self, contract_address, contract_abi):
         """Get contract instance."""
@@ -135,7 +136,6 @@ class ContractFunctions:
 
         except Exception as e:
             print(f"Error in contract function call: {e}")
-            raise
 
     def _decode_function_decoded_logs(self, contract, function_name: str, tx_receipt):
         """
