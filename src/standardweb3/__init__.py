@@ -80,6 +80,11 @@ class StandardClient:
             print(f"Warning: Could not fetch tokens during initialization: {e}")
             self._tokens = []
 
+        # get token info in dict
+        self._token_info = {}
+        for token in self._tokens:
+            self._token_info[token["id"]] = token
+
         # Initialize pair data (will be loaded lazily)
         try:
             pair_data = self.api.fetch_all_pairs_sync(100, 1)
@@ -124,13 +129,34 @@ class StandardClient:
         """Get the loaded base and quote."""
         return self._base_quote
 
+    @property
+    def token_info(self):
+        """Get the loaded token info."""
+        return self._token_info
+
     #########################################################
 
     # Contract functions
     async def market_buy(
         self, base, quote, quote_amount, is_maker, n, recipient, slippageLimit
     ) -> str:
-        """Execute a market buy order."""
+        """Execute a market buy order.
+
+        Args:
+            base: Base token address
+            quote: Quote token address
+            quote_amount: Amount of quote token to spend in decimals,
+            the amount is parsed to quote's decimals from token_info
+            is_maker: Whether this is a maker order
+            n: Number of matches
+            recipient: Recipient address
+            slippageLimit: Slippage limit (in percentage) (e.g. 0.1%)
+
+        """
+        # parse slippageLimit percentage to 8 decimals (1% -> 1000000)
+        slippageLimit = slippageLimit * 10**6
+        # parse quote_amount to quote's decimals from token_info
+        quote_amount = quote_amount * 10 ** self.token_info[quote]["decimals"]
         return await self.contract.market_buy(
             base, quote, quote_amount, is_maker, n, recipient, slippageLimit
         )
@@ -138,7 +164,23 @@ class StandardClient:
     async def market_sell(
         self, base, quote, base_amount, is_maker, n, recipient, slippageLimit
     ) -> str:
-        """Execute a market sell order."""
+        """Execute a market sell order.
+
+        Args:
+            base: Base token address
+            quote: Quote token address
+            base_amount: Amount of base token to sell in decimals,
+            the amount is parsed to base's decimals from token_info
+            is_maker: Whether this is a maker order
+            n: Number of matches
+            recipient: Recipient address
+            slippageLimit: Slippage limit (in percentage) (e.g. 0.1%)
+        """
+        # parse slippageLimit percentage to 8 decimals (1% -> 1000000)
+        slippageLimit = slippageLimit * 10**6
+        # parse base_amount to base's decimals from token_info
+        base_amount = base_amount * 10 ** self.token_info[base]["decimals"]
+
         return await self.contract.market_sell(
             base, quote, base_amount, is_maker, n, recipient, slippageLimit
         )
@@ -146,7 +188,23 @@ class StandardClient:
     async def limit_buy(
         self, base, quote, price, quote_amount, is_maker, n, recipient
     ) -> str:
-        """Execute a limit buy order."""
+        """Execute a limit buy order.
+
+        Args:
+            base: Base token address
+            quote: Quote token address
+            price: Price per unit (in wei)
+            quote_amount: Amount of quote token to spend in decimals,
+            the amount is parsed to quote's decimals from token_info
+            is_maker: Whether this is a maker order
+            n: Number of matches
+            recipient: Recipient address
+        """
+        # parse price to 8 decimals
+        price = price * 10**8
+        # parse quote_amount to quote's decimals from token_info
+        quote_amount = quote_amount * 10 ** self.token_info[quote]["decimals"]
+
         return await self.contract.limit_buy(
             base, quote, price, quote_amount, is_maker, n, recipient
         )
@@ -154,32 +212,130 @@ class StandardClient:
     async def limit_sell(
         self, base, quote, price, base_amount, is_maker, n, recipient
     ) -> str:
-        """Execute a limit sell order."""
+        """Execute a limit sell order.
+
+        Args:
+            base: Base token address
+            quote: Quote token address
+            price: Price per unit (in wei)
+            base_amount: Amount of base token to sell in decimals,
+            the amount is parsed to base's decimals from token_info
+            is_maker: Whether this is a maker order
+            n: Number of matches
+            recipient: Recipient address
+        """
+        # parse price to 8 decimals
+        price = price * 10**8
+        # parse base_amount to base's decimals from token_info
+        base_amount = base_amount * 10 ** self.token_info[base]["decimals"]
+
         return await self.contract.limit_sell(
             base, quote, price, base_amount, is_maker, n, recipient
         )
 
     async def create_orders(self, create_order_data: list) -> dict:
-        """Create multiple orders."""
+        """Create multiple orders.
+
+        Args:
+            create_order_data: List of dictionaries containing the order data.
+            Each dictionary should contain:
+                - base: address of base token
+                - quote: address of quote token
+                - isBid: bool, True for buy orders, False for sell orders
+                - isLimit: bool, True for limit orders, False for market orders
+                - orderId: int, order ID (optional, defaults to 0)
+                - price: int, price in wei
+                - amount: int, amount in wei
+                - n: int, number parameter
+                - recipient: address of recipient
+                - isETH: bool, True for ETH orders, False for token orders
+        """
+        # parse price to 8 decimals
+        for order in create_order_data:
+            order["price"] = order["price"] * 10**8
+        # parse amount to amount's decimals from token_info
+        for order in create_order_data:
+            order["amount"] = (
+                order["amount"] * 10 ** self.token_info[order["base"]]["decimals"]
+            )
+
         return await self.contract.create_orders(create_order_data)
 
     async def update_orders(self, update_order_data: list) -> dict:
-        """Update multiple orders."""
+        """Update multiple orders.
+
+        Args:
+            update_order_data: List of dictionaries containing the order data.
+            Each dictionary should contain:
+                - base: address of base token
+                - quote: address of quote token
+                - isBid: bool, True for buy orders, False for sell orders
+                - isLimit: bool, True for limit orders, False for market orders
+                - orderId: int, order ID (required for updates)
+                - price: int, price in wei
+                - amount: int, amount in wei
+                - n: int, number parameter
+                - recipient: address of recipient
+                - isETH: bool, True for ETH orders, False for token orders
+        """
+        # parse price to 8 decimals
+        for order in update_order_data:
+            order["price"] = order["price"] * 10**8
+        # parse amount to amount's decimals from token_info
+        for order in update_order_data:
+            order["amount"] = (
+                order["amount"] * 10 ** self.token_info[order["base"]]["decimals"]
+            )
+
         return await self.contract.update_orders(update_order_data)
 
     async def cancel_orders(self, cancel_order_data: list) -> str:
-        """Cancel multiple orders."""
+        """Cancel multiple orders.
+
+        Args:
+            cancel_order_data: List of order IDs to cancel.
+            each order id is a string containing the base, quote, isBid, and orderId
+            e.g. "0x..._0x..._True_12345"
+        """
         return await self.contract.cancel_orders(cancel_order_data)
 
     # ETH-specific trading functions
     async def limit_buy_eth(self, base, price, is_maker, n, recipient, eth_amount):
-        """Execute a limit buy order using ETH as quote token."""
+        """Execute a limit buy order using ETH as quote token.
+
+        Args:
+            base: Base token address
+            price: Price per unit (in wei)
+            is_maker: Whether this is a maker order
+            n: Number of matches
+            recipient: Recipient address
+            eth_amount: Amount of ETH to spend in decimals,
+            the amount is parsed to ETH's decimals from token_info
+        """
+        # parse price to 8 decimals
+        price = price * 10**8
+        # parse eth_amount to 18 decimals
+        eth_amount = eth_amount * 10**18
         return await self.contract.limit_buy_eth(
             base, price, is_maker, n, recipient, eth_amount
         )
 
     async def limit_sell_eth(self, quote, price, is_maker, n, recipient, eth_amount):
-        """Execute a limit sell order selling ETH for quote tokens."""
+        """Execute a limit sell order selling ETH for quote tokens.
+
+        Args:
+            quote: Quote token address
+            price: Price per unit (in wei)
+            is_maker: Whether this is a maker order
+            n: Number of matches
+            recipient: Recipient address
+            eth_amount: Amount of ETH to sell in decimals,
+            the amount is parsed to ETH's decimals from token_info
+        """
+        # parse price to 8 decimals
+        price = price * 10**8
+        # parse eth_amount to 18 decimals
+        eth_amount = eth_amount * 10**18
         return await self.contract.limit_sell_eth(
             quote, price, is_maker, n, recipient, eth_amount
         )
@@ -187,7 +343,21 @@ class StandardClient:
     async def market_buy_eth(
         self, base, is_maker, n, recipient, slippage_limit, eth_amount
     ):
-        """Execute a market buy order using ETH as quote token."""
+        """Execute a market buy order using ETH as quote token.
+
+        Args:
+            base: Base token address
+            is_maker: Whether this is a maker order
+            n: Number of matches
+            recipient: Recipient address
+            slippage_limit: Slippage limit (in percentage) (e.g. 0.1%)
+            eth_amount: Amount of ETH to spend in decimals,
+            the amount is parsed to ETH's decimals from token_info
+        """
+        # parse slippage_limit percentage to 8 decimals (1% -> 1000000)
+        slippage_limit = slippage_limit * 10**6
+        # parse eth_amount to 18 decimals
+        eth_amount = eth_amount * 10**18
         return await self.contract.market_buy_eth(
             base, is_maker, n, recipient, slippage_limit, eth_amount
         )
@@ -195,7 +365,21 @@ class StandardClient:
     async def market_sell_eth(
         self, quote, is_maker, n, recipient, slippage_limit, eth_amount
     ):
-        """Execute a market sell order selling ETH for quote tokens."""
+        """Execute a market sell order selling ETH for quote tokens.
+
+        Args:
+            quote: Quote token address
+            is_maker: Whether this is a maker order
+            n: Number of matches
+            recipient: Recipient address
+            slippage_limit: Slippage limit (in percentage) (e.g. 0.1%)
+            eth_amount: Amount of ETH to sell in decimals,
+            the amount is parsed to ETH's decimals from token_info
+        """
+        # parse slippage_limit percentage to 8 decimals (1% -> 1000000)
+        slippage_limit = slippage_limit * 10**6
+        # parse eth_amount to 18 decimals
+        eth_amount = eth_amount * 10**18
         return await self.contract.market_sell_eth(
             quote, is_maker, n, recipient, slippage_limit, eth_amount
         )

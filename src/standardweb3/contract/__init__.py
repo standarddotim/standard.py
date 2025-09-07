@@ -20,6 +20,7 @@ class ContractFunctions:
         matching_engine: str,
         matching_engine_abi: dict,
         base_quote: dict,
+        token_info: dict,
     ):
         """
         Initialize contract functions.
@@ -49,6 +50,7 @@ class ContractFunctions:
         self.matching_engine = matching_engine
         self.matching_engine_abi = matching_engine_abi
         self.base_quote = base_quote
+        self.token_info = token_info
 
     def get_contract(self, contract_address, contract_abi):
         """Get contract instance."""
