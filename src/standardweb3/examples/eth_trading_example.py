@@ -110,8 +110,8 @@ async def eth_trading_example():
     print("💸 Limit Sell ETH Example")
     try:
         quote_token = "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Token to receive
-        price = 38600000000  # 1000 tokens per ETH
-        eth_amount = client.w3.to_wei(0.01, "ether")  # Sell 0.01 ETH
+        price = 386  # 386 tokens per ETH
+        eth_amount = 1  # Sell 1 ETH
 
         result = await client.limit_sell_eth(
             quote=quote_token,
@@ -125,7 +125,7 @@ async def eth_trading_example():
         print("✅ Limit sell ETH successful!")
         print(f"  TX Hash: {result['tx_hash']}")
         print(f"  Gas Used: {result['gas_used']}")
-        print(f"  ETH Sold: {client.w3.from_wei(eth_amount, 'ether')} ETH")
+        print(f"  ETH Sold: {eth_amount} ETH")
 
     except Exception as e:
         print(f"❌ Limit sell ETH failed: {e}")
@@ -136,7 +136,7 @@ async def eth_trading_example():
     print("📉 Market Sell ETH Example")
     try:
         quote_token = "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Token to receive
-        eth_amount = client.w3.to_wei(0.005, "ether")  # Sell 0.005 ETH
+        eth_amount = 0.005  # Sell 0.005 ETH
 
         result = await client.market_sell_eth(
             quote=quote_token,
@@ -150,7 +150,7 @@ async def eth_trading_example():
         print("✅ Market sell ETH successful!")
         print(f"  TX Hash: {result['tx_hash']}")
         print(f"  Gas Used: {result['gas_used']}")
-        print(f"  ETH Sold: {client.w3.from_wei(eth_amount, 'ether')} ETH")
+        print(f"  ETH Sold: {eth_amount} ETH")
 
     except Exception as e:
         print(f"❌ Market sell ETH failed: {e}")

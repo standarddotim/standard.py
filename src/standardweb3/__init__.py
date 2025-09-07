@@ -77,8 +77,8 @@ class StandardClient:
             token_data = self.api.fetch_all_tokens_sync(100, 1)
             self._tokens = token_data.get("tokens", []) if token_data else []
         except Exception as e:
-            print(f"Warning: Could not fetch tokens during initialization: {e}")
-            self._tokens = []
+            print(f"Error: Could not fetch tokens during initialization: {e}")
+            raise e
 
         # get token info in dict
         self._token_info = {}
@@ -90,15 +90,20 @@ class StandardClient:
             pair_data = self.api.fetch_all_pairs_sync(100, 1)
             self._pairs = pair_data.get("pairs", []) if pair_data else []
         except Exception as e:
-            print(f"Warning: Could not fetch pairs during initialization: {e}")
-            self._pairs = []
+            print(f"Error: Could not fetch pairs during initialization: {e}")
+            raise e
 
         # get base and quote from pairs
         self._base_quote = {}
         for pair in self._pairs:
+            symbol = pair["symbol"]
             base_id = pair["base"]["id"]
             quote_id = pair["quote"]["id"]
-            self._base_quote[pair["id"]] = {"base": base_id, "quote": quote_id}
+            self._base_quote[pair["id"]] = {
+                "base": base_id,
+                "quote": quote_id,
+                "symbol": symbol,
+            }
 
         # Initialize contract functions
         self.contract = ContractFunctions(
@@ -107,6 +112,7 @@ class StandardClient:
             self.matching_engine_address,
             matching_engine_abi,
             base_quote=self._base_quote,
+            token_info=self._token_info,
         )
 
         # Expose commonly used attributes from contract
@@ -155,7 +161,7 @@ class StandardClient:
         # parse slippageLimit percentage to 8 decimals (1% -> 1000000)
         slippageLimit = slippageLimit * 10**6
         # parse quote_amount to quote's decimals from token_info
-        quote_amount = quote_amount * 10 ** self.token_info[quote]["decimals"]
+        quote_amount = quote_amount * 10 ** self.token_info[quote.lower()]["decimals"]
         return await self.contract.market_buy(
             base, quote, quote_amount, is_maker, n, recipient, slippageLimit
         )
@@ -178,7 +184,7 @@ class StandardClient:
         # parse slippageLimit percentage to 8 decimals (1% -> 1000000)
         slippageLimit = slippageLimit * 10**6
         # parse base_amount to base's decimals from token_info
-        base_amount = base_amount * 10 ** self.token_info[base]["decimals"]
+        base_amount = base_amount * 10 ** self.token_info[base.lower()]["decimals"]
 
         return await self.contract.market_sell(
             base, quote, base_amount, is_maker, n, recipient, slippageLimit
@@ -202,7 +208,7 @@ class StandardClient:
         # parse price to 8 decimals
         price = price * 10**8
         # parse quote_amount to quote's decimals from token_info
-        quote_amount = quote_amount * 10 ** self.token_info[quote]["decimals"]
+        quote_amount = quote_amount * 10 ** self.token_info[quote.lower()]["decimals"]
 
         return await self.contract.limit_buy(
             base, quote, price, quote_amount, is_maker, n, recipient
@@ -226,7 +232,7 @@ class StandardClient:
         # parse price to 8 decimals
         price = price * 10**8
         # parse base_amount to base's decimals from token_info
-        base_amount = base_amount * 10 ** self.token_info[base]["decimals"]
+        base_amount = base_amount * 10 ** self.token_info[base.lower()]["decimals"]
 
         return await self.contract.limit_sell(
             base, quote, price, base_amount, is_maker, n, recipient
@@ -255,7 +261,11 @@ class StandardClient:
         # parse amount to amount's decimals from token_info
         for order in create_order_data:
             order["amount"] = (
-                order["amount"] * 10 ** self.token_info[order["base"]]["decimals"]
+                order["amount"]
+                * 10 ** self.token_info[order["quote"].lower()]["decimals"]
+                if order["isBid"]
+                else order["amount"]
+                * 10 ** self.token_info[order["base"].lower()]["decimals"]
             )
 
         return await self.contract.create_orders(create_order_data)
@@ -283,7 +293,11 @@ class StandardClient:
         # parse amount to amount's decimals from token_info
         for order in update_order_data:
             order["amount"] = (
-                order["amount"] * 10 ** self.token_info[order["base"]]["decimals"]
+                order["amount"]
+                * 10 ** self.token_info[order["quote"].lower()]["decimals"]
+                if order["isBid"]
+                else order["amount"]
+                * 10 ** self.token_info[order["base"].lower()]["decimals"]
             )
 
         return await self.contract.update_orders(update_order_data)

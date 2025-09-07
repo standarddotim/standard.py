@@ -178,7 +178,7 @@ class ContractFunctions:
                             "block_number": tx_receipt.blockNumber,
                         }
                     )
-                    print(f"✅ Decoded {event_name}: {dict(decoded_log['args'])}")
+                    # print(f"✅ Decoded {event_name}: {dict(decoded_log['args'])}")
                     break  # Successfully decoded, move to next log
                 except Exception:
                     continue  # Try next event type
@@ -192,6 +192,8 @@ class ContractFunctions:
     def _parse_decoded_logs(self, decoded_logs):
         """Parse decoded logs."""
         try:
+            if decoded_logs is None:
+                return []
             order_info = {}
             order_infos = []
             for i, log in enumerate(decoded_logs):
@@ -201,47 +203,84 @@ class ContractFunctions:
                 if log["event"] == "OrderPlaced":
                     # you must make pair to lowercase to match with api
                     pair_lowercase = log["args"]["pair"].lower()
-                    print(f"      Order ID: {log['args']['id']}")
-                    print(f"      Price: {log['args']['price']}")
-                    print(f"      Amount Placed: {log['args']['placed']}")
-                    print(f"      Pair: {pair_lowercase}")
-                    print(f"      Base: {self.base_quote[pair_lowercase]['base']}")
-                    print(f"      Quote: {self.base_quote[pair_lowercase]['quote']}")
                     base = self.base_quote[pair_lowercase]["base"]
                     quote = self.base_quote[pair_lowercase]["quote"]
                     is_bid = log["args"]["isBid"]
-                    order_id = log["args"]["orderId"]
+                    order_id = log["args"]["id"]
                     order_info["id"] = f"{base}_{quote}_{is_bid}_{order_id}"
                     order_info["price"] = log["args"]["price"]
                     order_info["amount"] = log["args"]["placed"]
                     # if there are multiple orders placed, add them to order_info
                     order_infos.append(order_info)
                     order_info = {}
-                elif log["event"] == "OrderMatched":
+                    placed_lowercase = quote if is_bid else base
                     print(f"      Order ID: {log['args']['id']}")
-                    print(f"      Price: {log['args']['price']}")
-                    print(f"      Total: {log['args']['total']}")
+                    print(f"      Price: {log['args']['price'] / 10**8}")
+                    amount_placed = (
+                        log["args"]["placed"]
+                        / 10 ** self.token_info[placed_lowercase]["decimals"]
+                    )
+                    symbol = self.token_info[placed_lowercase]["symbol"]
+                    print(f"      Amount Placed: {amount_placed} {symbol}")
+                    pair_symbol = self.base_quote[pair_lowercase]["symbol"]
+                    print(f"      Pair: {pair_lowercase} {pair_symbol}")
+                    print(f"      Base: {self.base_quote[pair_lowercase]['base']}")
+                    print(f"      Quote: {self.base_quote[pair_lowercase]['quote']}")
+
+                elif log["event"] == "OrderMatched":
+                    pair_lowercase = log["args"]["pair"].lower()
+                    base = self.base_quote[pair_lowercase]["base"]
+                    quote = self.base_quote[pair_lowercase]["quote"]
+                    is_bid = log["args"]["isBid"]
+                    order_id = log["args"]["id"]
+                    matched_lowercase = quote if is_bid else base
+                    print(f"      Order ID: {order_id}")
+                    print(f"      Price: {log['args']['price'] / 10**8}")
+                    base_amount = (
+                        log["args"]["orderMatch"]["baseAmount"]
+                        / 10 ** self.token_info[base]["decimals"]
+                    )
+                    base_symbol = self.token_info[base]["symbol"]
+                    print(f"      Matched Base: {base_amount} {base_symbol}")
+                    quote_amount = (
+                        log["args"]["orderMatch"]["quoteAmount"]
+                        / 10 ** self.token_info[quote]["decimals"]
+                    )
+                    quote_symbol = self.token_info[quote]["symbol"]
+                    print(f"      Matched Quote: {quote_amount} {quote_symbol}")
+                    total_amount = (
+                        log["args"]["total"]
+                        / 10 ** self.token_info[matched_lowercase]["decimals"]
+                    )
+                    total_symbol = self.token_info[matched_lowercase]["symbol"]
+                    print(f"      Total: {total_amount} {total_symbol}")
                 elif log["event"] == "OrderCanceled":
                     print(f"      Order ID: {log['args']['id']}")
                     print(f"      Price: {log['args']['price']}")
                     print(f"      Amount Canceled: {log['args']['amount']}")
                 elif log["event"] == "NewMarketPrice":
                     pair_lowercase = log["args"]["pair"].lower()
-                    print(f"      Price: {log['args']['price']}")
+                    print(f"      Price: {log['args']['price'] / 10**8}")
                     # NewMarketPrice event has 'pair' instead of 'base' and 'quote'
-                    print(f"      Pair: {pair_lowercase}")
+                    pair_symbol = self.base_quote[pair_lowercase]["symbol"]
+                    print(f"      Pair: {pair_lowercase} {pair_symbol}")
                     base = self.base_quote[pair_lowercase]["base"]
                     quote = self.base_quote[pair_lowercase]["quote"]
-                    print(f"      Base Token: {base}")
-                    print(f"      Quote Token: {quote}")
+                    base_symbol = self.token_info[base]["symbol"]
+                    print(f"      Base Token: {base} {base_symbol}")
+                    quote_symbol = self.token_info[quote]["symbol"]
+                    print(f"      Quote Token: {quote} {quote_symbol}")
                 elif log["event"] == "PairAdded":
                     if "pair" in log["args"]:
                         pair_lowercase = log["args"]["pair"].lower()
-                        print(f"      Pair: {pair_lowercase}")
+                        pair_symbol = self.base_quote[pair_lowercase]["symbol"]
+                        print(f"      Pair: {pair_lowercase} {pair_symbol}")
                         base = self.base_quote[pair_lowercase]["base"]
                         quote = self.base_quote[pair_lowercase]["quote"]
-                        print(f"      Base Token: {base}")
-                        print(f"      Quote Token: {quote}")
+                        base_symbol = self.token_info[base]["symbol"]
+                        print(f"      Base Token: {base} {base_symbol}")
+                        quote_symbol = self.token_info[quote]["symbol"]
+                        print(f"      Quote Token: {quote} {quote_symbol}")
 
             return (
                 order_infos[0]
