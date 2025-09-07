@@ -151,7 +151,6 @@ class StandardClient:
             n: Number of matches
             recipient: Recipient address
             slippageLimit: Slippage limit (in percentage) (e.g. 0.1%)
-
         """
         # parse slippageLimit percentage to 8 decimals (1% -> 1000000)
         slippageLimit = slippageLimit * 10**6
