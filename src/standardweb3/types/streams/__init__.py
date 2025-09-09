@@ -1,32 +1,27 @@
-"""Type definitions for Standard Protocol.
+"""Stream types for Standard Protocol."""
 
-This module provides all the type definitions used throughout the Standard Protocol,
-including stream types, trading types, and utility types.
-"""
-
-from .token import TokenBucket, TokenInfo, Token
-from .orderbook import Orderbook, Tick, TickEvent, DeleteTickEvent, MarketPriceEvent
-from .tradehistory import UpdateTradeHistoryEvent, TradeHistory, AccountTradeHistory
-from .orderhistory import OrderHistory, AccountOrderHistory
-from .trade import Trade, TradesData, UpdateTradeEvent
-from .pair import Pair, PairData
-from .order import Order, AccountOrders, OrderEvent, DeleteOrderEvent
-from .streams import (
+from .bars.spot import (
     SpotBarEvent,
     SpotBarStream,
     event_to_spot_bar_stream,
     stream_to_spot_bar_event,
     validate_spot_bar_stream,
+)
+from .orderbook.spot import (
     SpotOrderBlockEvent,
     SpotOrderBlockStream,
     event_to_spot_order_block_stream,
     stream_to_spot_order_block_event,
     validate_spot_order_block_stream,
+)
+from .orderhistories.spot import (
     SpotOrderHistoryEvent,
     SpotOrderHistoryStream,
     event_to_spot_order_history_stream,
     stream_to_spot_order_history_event,
     validate_spot_order_history_stream,
+)
+from .orders.spot import (
     SpotOrderMatchedEvent,
     SpotOrderMatchedStream,
     event_to_spot_order_matched_stream,
@@ -42,6 +37,8 @@ from .streams import (
     event_to_spot_delete_order_item_stream,
     stream_to_spot_delete_order_item_event,
     validate_spot_delete_order_item_stream,
+)
+from .trades.spot import (
     SpotTradeEvent,
     SpotTradeStream,
     event_to_spot_trade_stream,
@@ -50,28 +47,6 @@ from .streams import (
 )
 
 __all__ = [
-    "TokenBucket",
-    "TokenInfo",
-    "Token",
-    "Orderbook",
-    "Tick",
-    "TickEvent",
-    "DeleteTickEvent",
-    "MarketPriceEvent",
-    "UpdateTradeHistoryEvent",
-    "TradeHistory",
-    "AccountTradeHistory",
-    "OrderHistory",
-    "AccountOrderHistory",
-    "Trade",
-    "TradesData",
-    "UpdateTradeEvent",
-    "Pair",
-    "PairData",
-    "Order",
-    "AccountOrders",
-    "OrderEvent",
-    "DeleteOrderEvent",
     "SpotBarEvent",
     "SpotBarStream",
     "event_to_spot_bar_stream",

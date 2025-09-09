@@ -84,6 +84,10 @@ class ContractFunctions:
         # Extract eth_amount if provided (for ETH functions)
         eth_amount = kwargs.pop("eth_amount", 0)
 
+        # Extract gas if provided
+        gas = kwargs.pop("gas", 3000000)
+        gas_price = kwargs.pop("gas_price", self.w3.to_wei(6, "gwei"))
+
         # Get the contract function and build transaction
         try:
             contract_function = getattr(contract.functions, function_name)
@@ -94,8 +98,8 @@ class ContractFunctions:
                 tx_params = {
                     "from": self.address,
                     "nonce": self.w3.eth.get_transaction_count(self.address),
-                    "gas": 3000000,
-                    "gasPrice": self.w3.to_wei(6, "gwei"),
+                    "gas": gas,
+                    "gasPrice": gas_price,
                 }
 
                 # Add value for ETH transactions
@@ -208,6 +212,11 @@ class ContractFunctions:
                     is_bid = log["args"]["isBid"]
                     order_id = log["args"]["id"]
                     order_info["id"] = f"{base}_{quote}_{is_bid}_{order_id}"
+                    order_info["pair"] = pair_lowercase
+                    order_info["base"] = base
+                    order_info["quote"] = quote
+                    order_info["isBid"] = is_bid
+                    order_info["orderId"] = order_id
                     order_info["price"] = log["args"]["price"]
                     order_info["amount"] = log["args"]["placed"]
                     # if there are multiple orders placed, add them to order_info
@@ -292,7 +301,16 @@ class ContractFunctions:
             return []
 
     async def market_buy(
-        self, base, quote, quote_amount, is_maker, n, recipient, slippageLimit
+        self,
+        base,
+        quote,
+        quote_amount,
+        is_maker,
+        n,
+        recipient,
+        slippageLimit,
+        gas=3000000,  # 3 million wei
+        gas_price=6000000000,  # 6 gwei
     ) -> dict:
         """Execute a market buy order."""
         # Ensure proper types for contract call
@@ -312,10 +330,21 @@ class ContractFunctions:
             n,
             recipient,
             slippageLimit,
+            gas=gas,
+            gas_price=gas_price,
         )
 
     async def market_sell(
-        self, base, quote, base_amount, is_maker, n, recipient, slippageLimit
+        self,
+        base,
+        quote,
+        base_amount,
+        is_maker,
+        n,
+        recipient,
+        slippageLimit,
+        gas=3000000,
+        gas_price=6000000000,  # 6 gwei
     ) -> dict:
         """Execute a market sell order."""
         # Ensure proper types for contract call
@@ -335,10 +364,21 @@ class ContractFunctions:
             n,
             recipient,
             slippageLimit,
+            gas=gas,
+            gas_price=gas_price,
         )
 
     async def limit_buy(
-        self, base, quote, price, quote_amount, is_maker, n, recipient
+        self,
+        base,
+        quote,
+        price,
+        quote_amount,
+        is_maker,
+        n,
+        recipient,
+        gas=3000000,  # 3 million wei
+        gas_price=6000000000,  # 6 gwei
     ) -> dict:
         """Execute a limit buy order."""
         # Ensure proper types for contract call
@@ -358,10 +398,21 @@ class ContractFunctions:
             is_maker,
             n,
             recipient,
+            gas=gas,
+            gas_price=gas_price,
         )
 
     async def limit_sell(
-        self, base, quote, price, base_amount, is_maker, n, recipient
+        self,
+        base,
+        quote,
+        price,
+        base_amount,
+        is_maker,
+        n,
+        recipient,
+        gas=3000000,  # 3 million wei
+        gas_price=6000000000,  # 6 gwei
     ) -> dict:
         """Execute a limit sell order."""
         # Ensure proper types for contract call
@@ -381,10 +432,20 @@ class ContractFunctions:
             is_maker,
             n,
             recipient,
+            gas=gas,
+            gas_price=gas_price,
         )
 
     async def limit_buy_eth(
-        self, base, price, is_maker, n, recipient, eth_amount
+        self,
+        base,
+        price,
+        is_maker,
+        n,
+        recipient,
+        eth_amount,
+        gas=3000000,
+        gas_price=6000000000,  # 6 gwei
     ) -> dict:
         """Execute a limit buy order using ETH as quote token."""
         # Ensure proper types for contract call
@@ -402,10 +463,20 @@ class ContractFunctions:
             n,
             recipient,
             eth_amount=eth_amount,  # This will be sent as msg.value
+            gas=gas,
+            gas_price=gas_price,
         )
 
     async def limit_sell_eth(
-        self, quote, price, is_maker, n, recipient, eth_amount
+        self,
+        quote,
+        price,
+        is_maker,
+        n,
+        recipient,
+        eth_amount,
+        gas=3000000,
+        gas_price=6000000000,  # 6 gwei
     ) -> dict:
         """Execute a limit sell order selling ETH for quote tokens."""
         # Ensure proper types for contract call
@@ -423,10 +494,20 @@ class ContractFunctions:
             n,
             recipient,
             eth_amount=eth_amount,  # This will be sent as msg.value
+            gas=gas,
+            gas_price=gas_price,
         )
 
     async def market_buy_eth(
-        self, base, is_maker, n, recipient, slippage_limit, eth_amount
+        self,
+        base,
+        is_maker,
+        n,
+        recipient,
+        slippage_limit,
+        eth_amount,
+        gas=3000000,  # 3 million wei
+        gas_price=6000000000,  # 6 gwei
     ) -> dict:
         """Execute a market buy order using ETH as quote token."""
         # Ensure proper types for contract call
@@ -444,10 +525,20 @@ class ContractFunctions:
             recipient,
             slippage_limit,
             eth_amount=eth_amount,  # This will be sent as msg.value
+            gas=gas,
+            gas_price=gas_price,
         )
 
     async def market_sell_eth(
-        self, quote, is_maker, n, recipient, slippage_limit, eth_amount
+        self,
+        quote,
+        is_maker,
+        n,
+        recipient,
+        slippage_limit,
+        eth_amount,
+        gas=3000000,  # 3 million wei
+        gas_price=6000000000,  # 6 gwei
     ) -> dict:
         """Execute a market sell order selling ETH for quote tokens."""
         # Ensure proper types for contract call
@@ -465,9 +556,16 @@ class ContractFunctions:
             recipient,
             slippage_limit,
             eth_amount=eth_amount,  # This will be sent as msg.value
+            gas=gas,
+            gas_price=gas_price,
         )
 
-    async def create_orders(self, create_order_data: list) -> dict:
+    async def create_orders(
+        self,
+        create_order_data: list,
+        gas=3000000,  # 3 million wei
+        gas_price=6000000000,  # 6 gwei
+    ) -> dict:
         """
         Create multiple orders.
 
@@ -562,11 +660,23 @@ class ContractFunctions:
             if order_data["isETH"]:
                 eth_amount += int(order_data["amount"])
 
+        if gas < 3000000 * len(processed_data):
+            gas = 3000000 * len(processed_data)
+
         return await self._execute_transaction(
-            "createOrders", processed_data, eth_amount=eth_amount
+            "createOrders",
+            processed_data,
+            eth_amount=eth_amount,
+            gas=gas,
+            gas_price=gas_price,
         )
 
-    async def update_orders(self, update_order_data: list) -> dict:
+    async def update_orders(
+        self,
+        update_order_data: list,
+        gas=3000000,  # 3 million wei
+        gas_price=6000000000,  # 6 gwei
+    ) -> dict:
         """
         Update multiple orders.
 
@@ -656,11 +766,23 @@ class ContractFunctions:
             if order_data["isETH"]:
                 eth_amount += int(order_data["amount"])
 
+        if gas < 3000000 * len(processed_data):
+            gas = 3000000 * len(processed_data)
+
         return await self._execute_transaction(
-            "updateOrders", processed_data, eth_amount=eth_amount
+            "updateOrders",
+            processed_data,
+            eth_amount=eth_amount,
+            gas=gas,
+            gas_price=gas_price,
         )
 
-    async def cancel_orders(self, cancel_order_data: list) -> str:
+    async def cancel_orders(
+        self,
+        cancel_order_data: list,
+        gas=3000000,  # 3 million wei
+        gas_price=6000000000,  # 6 gwei
+    ) -> str:
         """
         Cancel multiple orders.
 
@@ -716,4 +838,9 @@ class ContractFunctions:
             )
             processed_data.append(processed_order)
 
-        return await self._execute_transaction("cancelOrders", processed_data)
+        if gas < 3000000 * len(processed_data):
+            gas = 3000000 * len(processed_data)
+
+        return await self._execute_transaction(
+            "cancelOrders", processed_data, gas=gas, gas_price=gas_price
+        )

@@ -16,6 +16,7 @@ dependencies = [
     "eth-utils>=5.1.0",
     "httpx>=0.28.1",
     "pre-commit>=4.0.1",
+    "pydantic>=2.10.5",
     "python-dotenv>=1.0.1",
     "web3>=7.6.1",
     "websockets>=13.1",
