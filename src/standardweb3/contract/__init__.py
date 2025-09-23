@@ -576,7 +576,6 @@ class ContractFunctions:
                 - quote: address of quote token
                 - isBid: bool, True for buy orders, False for sell orders
                 - isLimit: bool, True for limit orders, False for market orders
-                - orderId: int, order ID (optional, defaults to 0)
                 - price: int, price in wei
                 - amount: int, amount in wei
                 - n: int, number parameter
@@ -629,7 +628,6 @@ class ContractFunctions:
                 "quote",
                 "isBid",
                 "isLimit",
-                "orderId",
                 "price",
                 "amount",
                 "n",
@@ -648,7 +646,7 @@ class ContractFunctions:
                 Web3.to_checksum_address(order_data["quote"]),
                 bool(order_data["isBid"]),
                 bool(order_data["isLimit"]),
-                int(order_data["orderId"]),
+                1,
                 int(order_data["price"]),
                 int(order_data["amount"]),
                 int(order_data["n"]),

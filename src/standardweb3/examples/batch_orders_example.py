@@ -14,6 +14,20 @@ from dotenv import load_dotenv
 from standardweb3 import StandardClient
 
 
+def parse_units(value: float, decimals: int) -> int:
+    """
+    Parse a float value to wei with specified decimal places.
+
+    Args:
+        value: The float value to parse
+        decimals: Number of decimal places
+
+    Returns:
+        int: The value in the smallest unit (wei equivalent)
+    """
+    return int(value * (10**decimals))
+
+
 async def batch_orders_example():
     """Demonstrate batch order operations."""
     # Load environment variables from .env file
@@ -56,10 +70,11 @@ async def batch_orders_example():
                 "isBid": True,  # Buy order
                 "isLimit": True,  # Limit order
                 "orderId": 1,
-                "price": client.w3.to_wei(0.001, "ether"),  # 0.001 ETH per token
-                "amount": client.w3.to_wei(10, "ether"),  # 10 tokens
+                "price": 0.001,  # 0.001 USDC per STT
+                "amount": 10,  # 10 USDC
                 "n": 1,
                 "recipient": client.address,
+                "isETH": False,
             },
             {
                 "base": base_token,
@@ -67,10 +82,11 @@ async def batch_orders_example():
                 "isBid": True,  # Buy order
                 "isLimit": True,  # Limit order
                 "orderId": 2,
-                "price": client.w3.to_wei(0.0009, "ether"),  # 0.0009 ETH per token
-                "amount": client.w3.to_wei(20, "ether"),  # 20 tokens
+                "price": 0.0009,  # 0.0009 USDC per STT
+                "amount": 20,  # 20 USDC
                 "n": 1,
                 "recipient": client.address,
+                "isETH": False,
             },
             {
                 "base": base_token,
@@ -78,10 +94,11 @@ async def batch_orders_example():
                 "isBid": False,  # Sell order
                 "isLimit": True,  # Limit order
                 "orderId": 3,
-                "price": client.w3.to_wei(0.002, "ether"),  # 0.002 ETH per token
-                "amount": client.w3.to_wei(5, "ether"),  # 5 tokens
+                "price": 400,  # 0.002 USDC per STT
+                "amount": 5,  # 5 USDC
                 "n": 1,
                 "recipient": client.address,
+                "isETH": True,
             },
         ]
 
@@ -90,7 +107,7 @@ async def batch_orders_example():
         print("✅ Multiple orders created successfully!")
         print(f"  TX Hash: {result['tx_hash']}")
         print(f"  Gas Used: {result['gas_used']}")
-        print(f"  Status: {'Success' if result['status'] == 1 else 'Failed'}")
+        print(f"  Created Orders: {result['order_infos']}")
 
         if result["decoded_logs"]:
             print(f"  📊 Events Decoded: {len(result['decoded_logs'])}")
@@ -116,22 +133,24 @@ async def batch_orders_example():
                 "quote": quote_token,
                 "isBid": True,
                 "isLimit": True,
-                "orderId": 1,
-                "price": client.w3.to_wei(0.0012, "ether"),  # Updated price
-                "amount": client.w3.to_wei(15, "ether"),  # Updated amount
+                "orderId": 2,
+                "price": 0.0011,  # Updated price: 0.0011 USDC per STT
+                "amount": 25,  # Updated amount
                 "n": 1,
                 "recipient": client.address,
+                "isETH": False,
             },
             {
                 "base": base_token,
                 "quote": quote_token,
-                "isBid": True,
-                "isLimit": True,
-                "orderId": 2,
-                "price": client.w3.to_wei(0.0011, "ether"),  # Updated price
-                "amount": client.w3.to_wei(25, "ether"),  # Updated amount
+                "isBid": False,  # Keep as BUY order (same as original)
+                "isLimit": True,  # Limit order
+                "orderId": 1,
+                "price": 400,  # Updated price: 0.0012 USDC per STT
+                "amount": 15,  # Updated amount: 15 USDC
                 "n": 1,
                 "recipient": client.address,
+                "isETH": True,  # Keep as token order
             },
         ]
 
@@ -140,7 +159,7 @@ async def batch_orders_example():
         print("✅ Multiple orders updated successfully!")
         print(f"  TX Hash: {result['tx_hash']}")
         print(f"  Gas Used: {result['gas_used']}")
-        print(f"  Status: {'Success' if result['status'] == 1 else 'Failed'}")
+        print(f"  TX Result: {result}")
 
         if result["decoded_logs"]:
             print(f"  📊 Events Decoded: {len(result['decoded_logs'])}")
@@ -163,10 +182,11 @@ async def batch_orders_example():
                 "isBid": True,
                 "isLimit": True,
                 # orderId not provided - will default to 0
-                "price": client.w3.to_wei(0.0015, "ether"),
-                "amount": client.w3.to_wei(8, "ether"),
+                "price": 0.0015,  # 0.0015 USDC per STT
+                "amount": 8,
                 "n": 1,
                 "recipient": client.address,
+                "isETH": False,
             }
         ]
 
