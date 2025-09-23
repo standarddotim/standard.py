@@ -418,7 +418,7 @@ matching_engine_abi = matching_engine_abi = [
             {"name": "isMaker", "type": "bool", "internalType": "bool"},
             {"name": "n", "type": "uint32", "internalType": "uint32"},
             {"name": "recipient", "type": "address", "internalType": "address"},
-            {"name": "slippageLimit", "type": "uint32", "internalType": "uint32"},
+            {"name": "slippage_limit", "type": "uint32", "internalType": "uint32"},
         ],
         "outputs": [
             {
@@ -442,7 +442,7 @@ matching_engine_abi = matching_engine_abi = [
             {"name": "isMaker", "type": "bool", "internalType": "bool"},
             {"name": "n", "type": "uint32", "internalType": "uint32"},
             {"name": "recipient", "type": "address", "internalType": "address"},
-            {"name": "slippageLimit", "type": "uint32", "internalType": "uint32"},
+            {"name": "slippage_limit", "type": "uint32", "internalType": "uint32"},
         ],
         "outputs": [
             {
@@ -468,7 +468,7 @@ matching_engine_abi = matching_engine_abi = [
             {"name": "isMaker", "type": "bool", "internalType": "bool"},
             {"name": "n", "type": "uint32", "internalType": "uint32"},
             {"name": "recipient", "type": "address", "internalType": "address"},
-            {"name": "slippageLimit", "type": "uint32", "internalType": "uint32"},
+            {"name": "slippage_limit", "type": "uint32", "internalType": "uint32"},
         ],
         "outputs": [
             {
@@ -492,7 +492,7 @@ matching_engine_abi = matching_engine_abi = [
             {"name": "isMaker", "type": "bool", "internalType": "bool"},
             {"name": "n", "type": "uint32", "internalType": "uint32"},
             {"name": "recipient", "type": "address", "internalType": "address"},
-            {"name": "slippageLimit", "type": "uint32", "internalType": "uint32"},
+            {"name": "slippage_limit", "type": "uint32", "internalType": "uint32"},
         ],
         "outputs": [
             {

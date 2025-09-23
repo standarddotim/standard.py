@@ -308,7 +308,7 @@ class ContractFunctions:
         is_maker,
         n,
         recipient,
-        slippageLimit,
+        slippage_limit,
         gas=3000000,  # 3 million wei
         gas_price=6000000000,  # 6 gwei
     ) -> dict:
@@ -319,7 +319,7 @@ class ContractFunctions:
         recipient = Web3.to_checksum_address(recipient)
         quote_amount = int(quote_amount)
         n = int(n)
-        slippageLimit = int(slippageLimit)
+        slippage_limit = int(slippage_limit)
 
         return await self._execute_transaction(
             "marketBuy",
@@ -329,7 +329,7 @@ class ContractFunctions:
             is_maker,
             n,
             recipient,
-            slippageLimit,
+            slippage_limit,
             gas=gas,
             gas_price=gas_price,
         )
@@ -342,7 +342,7 @@ class ContractFunctions:
         is_maker,
         n,
         recipient,
-        slippageLimit,
+        slippage_limit,
         gas=3000000,
         gas_price=6000000000,  # 6 gwei
     ) -> dict:
@@ -353,7 +353,7 @@ class ContractFunctions:
         recipient = Web3.to_checksum_address(recipient)
         base_amount = int(base_amount)
         n = int(n)
-        slippageLimit = int(slippageLimit)
+        slippage_limit = int(slippage_limit)
 
         return await self._execute_transaction(
             "marketSell",
@@ -363,7 +363,7 @@ class ContractFunctions:
             is_maker,
             n,
             recipient,
-            slippageLimit,
+            slippage_limit,
             gas=gas,
             gas_price=gas_price,
         )

@@ -144,7 +144,7 @@ class StandardClient:
 
     # Contract functions
     async def market_buy(
-        self, base, quote, quote_amount, is_maker, n, recipient, slippageLimit
+        self, base, quote, quote_amount, is_maker, n, recipient, slippage_limit
     ) -> str:
         """Execute a market buy order.
 
@@ -156,18 +156,18 @@ class StandardClient:
             is_maker: Whether this is a maker order
             n: Number of matches
             recipient: Recipient address
-            slippageLimit: Slippage limit (in percentage) (e.g. 0.1%)
+            slippage_limit: Slippage limit (in percentage) (e.g. 0.1%)
         """
-        # parse slippageLimit percentage to 8 decimals (1% -> 1000000)
-        slippageLimit = slippageLimit * 10**6
+        # parse slippage_limit percentage to 8 decimals (1% -> 1000000)
+        slippage_limit = slippage_limit * 10**6
         # parse quote_amount to quote's decimals from token_info
         quote_amount = quote_amount * 10 ** self.token_info[quote.lower()]["decimals"]
         return await self.contract.market_buy(
-            base, quote, quote_amount, is_maker, n, recipient, slippageLimit
+            base, quote, quote_amount, is_maker, n, recipient, slippage_limit
         )
 
     async def market_sell(
-        self, base, quote, base_amount, is_maker, n, recipient, slippageLimit
+        self, base, quote, base_amount, is_maker, n, recipient, slippage_limit
     ) -> str:
         """Execute a market sell order.
 
@@ -179,15 +179,15 @@ class StandardClient:
             is_maker: Whether this is a maker order
             n: Number of matches
             recipient: Recipient address
-            slippageLimit: Slippage limit (in percentage) (e.g. 0.1%)
+            slippage_limit: Slippage limit (in percentage) (e.g. 0.1%)
         """
-        # parse slippageLimit percentage to 8 decimals (1% -> 1000000)
-        slippageLimit = slippageLimit * 10**6
+        # parse slippage_limit percentage to 8 decimals (1% -> 1000000)
+        slippage_limit = slippage_limit * 10**6
         # parse base_amount to base's decimals from token_info
         base_amount = base_amount * 10 ** self.token_info[base.lower()]["decimals"]
 
         return await self.contract.market_sell(
-            base, quote, base_amount, is_maker, n, recipient, slippageLimit
+            base, quote, base_amount, is_maker, n, recipient, slippage_limit
         )
 
     async def limit_buy(

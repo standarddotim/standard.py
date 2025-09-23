@@ -130,7 +130,7 @@ async def return_values_example():
             is_maker=False,
             n=1,
             recipient=client.address,
-            slippageLimit=10000000,
+            slippage_limit=10000000,
         )
 
         print("✅ Market buy successful!")

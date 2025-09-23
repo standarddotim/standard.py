@@ -82,7 +82,7 @@ async def quick_trade():
         is_maker=False,
         n=1,
         recipient=client.address,
-        slippageLimit=1000000
+        slippage_limit=1000000
     )
     print(f"Trade successful: {tx_receipt['transactionHash'].hex()}")
 
@@ -180,7 +180,7 @@ tx_receipt = await client.market_buy(
     is_maker=False,
     n=1,
     recipient=client.address,
-    slippageLimit=1000000  # 10% slippage tolerance
+    slippage_limit=1000000  # 10% slippage tolerance
 )
 
 # Market Sell - Sell tokens immediately at market price
@@ -191,7 +191,7 @@ tx_receipt = await client.market_sell(
     is_maker=False,
     n=1,
     recipient=client.address,
-    slippageLimit=1000000  # 10% slippage tolerance
+    slippage_limit=1000000  # 10% slippage tolerance
 )
 ```
 
@@ -284,7 +284,7 @@ async def main():
             is_maker=False,
             n=1,
             recipient=client.address,
-            slippageLimit=1000000  # 10% slippage
+            slippage_limit=1000000  # 10% slippage
         )
         print(f"Market buy successful! TX: {tx_receipt['transactionHash'].hex()}")
 

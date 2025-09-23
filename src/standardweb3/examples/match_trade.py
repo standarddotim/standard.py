@@ -43,7 +43,7 @@ async def match_trade():
     print("-" * 50)
 
     # Example token addresses
-    base_token = "0x4A3BC48C156384f9564Fd65A53a2f3D534D8f2b7"  # Token to buy with ETH
+    base_token = "0xb35a7935F8fbc52fB525F16Af09329b3794E8C42"  # Token to buy with quote
     quote_token = "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Token to receive
 
     # Example 1: Market Buy
@@ -57,7 +57,7 @@ async def match_trade():
             is_maker=True,
             n=20,
             recipient=client.address,
-            slippageLimit=0.1,
+            slippage_limit=0.1,
         )
 
     except Exception as e:
@@ -66,24 +66,25 @@ async def match_trade():
     print()
 
     # Example 2: Market Sell ETH
-    print("📉 Market Sell ETH Example")
+    print("📉 Market Sell Example")
     try:
         quote_token = "0x0ED782B8079529f7385c3eDA9fAf1EaA0DbC6a17"  # Token to receive
-        eth_amount = 1  # Sell 1 ETH
+        base_amount = 1  # Sell 1 base token
 
-        result = await client.market_sell_eth(
+        result = await client.market_sell(
+            base=base_token,
             quote=quote_token,
             is_maker=True,
             n=1,
             recipient=client.address,
             slippage_limit=0.1,  # 0.1% slippage
-            eth_amount=eth_amount,
+            base_amount=base_amount,
         )
 
         print("✅ Market sell ETH successful!")
         print(f"  TX Hash: {result['tx_hash']}")
         print(f"  Gas Used: {result['gas_used']}")
-        print(f"  ETH Sold: {eth_amount} ETH")
+        print(f"  Base Sold: {base_amount} base token")
 
     except Exception as e:
         print(f"❌ Market sell ETH failed: {e}")
@@ -94,7 +95,11 @@ async def match_trade():
 
 async def main():
     """Run the ETH trading example."""
-    await match_trade()
+    for i in range(1000):
+        await match_trade()
+        print(f"Trade {i+1} completed")
+        print("-" * 50)
+        print()
 
 
 if __name__ == "__main__":

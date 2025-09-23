@@ -71,7 +71,7 @@ async def simple_trading_example():
             is_maker=True,
             n=20,
             recipient=client.address,
-            slippageLimit=10000000,
+            slippage_limit=10000000,
         )
         print("✅ Market buy successful!")
         print(f"  TX Hash: {result['tx_hash']}")
@@ -148,7 +148,7 @@ async def simple_trading_example():
             is_maker=True,
             n=20,
             recipient=client.address,
-            slippageLimit=10000000,
+            slippage_limit=10000000,
         )
         print("✅ Market sell successful! TX: {result}")
     except Exception as e:

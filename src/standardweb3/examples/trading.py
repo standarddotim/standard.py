@@ -69,7 +69,7 @@ class TradingExample:
         is_maker: bool = False,
         n: int = 1,
         recipient: Optional[str] = None,
-        slippageLimit: int = 10000000,
+        slippage_limit: int = 10000000,
     ):
         """
         Execute a market buy order.
@@ -92,7 +92,7 @@ class TradingExample:
         print(f"  Quote Amount: {self.client.w3.from_wei(quote_amount, 'ether')} ETH")
         print(f"  Is Maker: {is_maker}")
         print(f"  Recipient: {recipient}")
-        print(f"  Slippage Limit: {slippageLimit}")
+        print(f"  Slippage Limit: {slippage_limit}")
 
         try:
             tx_receipt = await self.client.market_buy(
@@ -102,7 +102,7 @@ class TradingExample:
                 is_maker=is_maker,
                 n=n,
                 recipient=recipient,
-                slippageLimit=slippageLimit,
+                slippage_limit=slippage_limit,
             )
 
             print("✅ Market Buy successful!")
@@ -124,7 +124,7 @@ class TradingExample:
         is_maker: bool = False,
         n: int = 1,
         recipient: Optional[str] = None,
-        slippageLimit: int = 10000000,
+        slippage_limit: int = 10000000,
     ):
         """
         Execute a market sell order.
@@ -147,7 +147,7 @@ class TradingExample:
         print(f"  Base Amount: {self.client.w3.from_wei(base_amount, 'ether')} tokens")
         print(f"  Is Maker: {is_maker}")
         print(f"  Recipient: {recipient}")
-        print(f"  Slippage Limit: {slippageLimit}")
+        print(f"  Slippage Limit: {slippage_limit}")
 
         try:
             tx_receipt = await self.client.market_sell(
@@ -157,7 +157,7 @@ class TradingExample:
                 is_maker=is_maker,
                 n=n,
                 recipient=recipient,
-                slippageLimit=slippageLimit,
+                slippage_limit=slippage_limit,
             )
 
             print("✅ Market Sell successful!")
@@ -417,7 +417,7 @@ class TradingExample:
                 quote_token=example_quote_token,
                 quote_amount=quote_amount,
                 is_maker=False,
-                slippageLimit=10000000,
+                slippage_limit=10000000,
             )
         except Exception as e:
             print(f"Market buy example failed: {e}")
@@ -434,7 +434,7 @@ class TradingExample:
                 quote_token=example_quote_token,
                 base_amount=base_amount,
                 is_maker=False,
-                slippageLimit=10000000,
+                slippage_limit=10000000,
             )
         except Exception as e:
             print(f"Market sell example failed: {e}")
