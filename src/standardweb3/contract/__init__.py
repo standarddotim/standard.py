@@ -145,6 +145,14 @@ class ContractFunctions:
 
         except Exception as e:
             print(f"Error in contract function call: {e}")
+            return {
+                "tx_receipt": None,
+                "tx_hash": None,
+                "decoded_logs": [],
+                "gas_used": 0,
+                "status": 0,
+                "error": str(e),
+            }
 
     def _decode_function_decoded_logs(self, contract, function_name: str, tx_receipt):
         """
